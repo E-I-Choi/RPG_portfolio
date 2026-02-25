@@ -1,0 +1,72 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Visual Studio
+.vs/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.user
+*.aps
+*.ncb
+*.opendb
+*.sdf
+*.suo
+
+# VS Code
+.vscode/
+bin/
+obj/
+
+# CMake
+out/
+build/
+
+#Unreal
+Binaries/
+Content/
+!Content/Blueprint/
+Build/
+DerivedDataCache/
+Intermediate/
+Saved/
+AudioCheck.txt
+VideoCheck.txt
+*.sln
+*.suo
+*.opensdf
+*.sdf
+*.layout
+*.VC.db
+*.VC.opendb
