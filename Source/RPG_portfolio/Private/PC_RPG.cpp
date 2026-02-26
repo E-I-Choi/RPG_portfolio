@@ -89,3 +89,25 @@ void APC_RPG::Server_ReqUpdateStatus_Implementation(const FStatus StatIncrease)
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
 	GI->UpdateCharStatusToDepot(this, StatIncrease);
 }
+
+void APC_RPG::Server_ReqUpdateHP_Implementation(const float HPIncrease)
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	GI->UpdateCharHPToDepot(this, HPIncrease);
+}
+
+void APC_RPG::Server_ReqUpdateMP_Implementation(const float MPIncrease)
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	GI->UpdateCharMPToDepot(this, MPIncrease);
+}
+
+bool APC_RPG::Server_ReqUpdateHP_Validate(const float HPIncrease)
+{
+	return true;
+}
+
+bool APC_RPG::Server_ReqUpdateMP_Validate(const float MPIncrease)
+{
+	return true;
+}

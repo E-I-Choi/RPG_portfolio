@@ -102,6 +102,11 @@ private:
 	void UpdateCharJob(const EClassType& NewClass);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	void UpdateCharStatus(const FStatus& StatIncrease);
+	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
+	void UpdateCharHP(const float& NewHP);
+	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
+	void UpdateCharMP(const float& NewMP);
+
 
 	UFUNCTION()
 	void UpdateCharNameToDepot(APlayerController* PC, const FString& InName);
@@ -117,6 +122,10 @@ private:
 	void UpdateCharJobToDepot(APlayerController* PC, const EClassType& NewClass);
 	UFUNCTION()
 	void UpdateCharStatusToDepot(APlayerController* PC, const FStatus& StatIncrease);
+	UFUNCTION()
+	void UpdateCharHPToDepot(APlayerController* PC, const float& HPIncrease);
+	UFUNCTION()
+	void UpdateCharMPToDepot(APlayerController* PC, const float& MPIncrease);
 	UFUNCTION()
 	void RegisterPlayer(APlayerController* PC, const FString& InId);
 	UFUNCTION()

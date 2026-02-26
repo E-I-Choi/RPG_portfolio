@@ -182,6 +182,22 @@ void URPGGameInstance::UpdateCharStatus(const FStatus& NewStat)
     TargetData = NewStat;
 }
 
+void URPGGameInstance::UpdateCharHP(const float& NewHP)
+{
+    if (GetWorld()->IsNetMode(NM_DedicatedServer)) return;
+    FCharData& TargetData = Characters[CurrentCharIndex];
+
+    TargetData.HP = NewHP;
+}
+
+void URPGGameInstance::UpdateCharMP(const float& NewMP)
+{
+    if (GetWorld()->IsNetMode(NM_DedicatedServer)) return;
+    FCharData& TargetData = Characters[CurrentCharIndex];
+
+    TargetData.MP = NewMP;
+}
+
 void URPGGameInstance::SetEntityInfo(const FString& InId, const FString& InType)
 {
     if (GetWorld()->IsNetMode(NM_DedicatedServer)) return;
@@ -267,7 +283,7 @@ void URPGGameInstance::UpdateCharExpToDepot(APlayerController* PC, const float& 
     URPGGameInstance* GI = Cast<URPGGameInstance>(PC->GetGameInstance());
     GI->UpdateCharExp(TargetData->Exp);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
-    //TheChar EXPµµ ¾÷µ¥ÀÌÆ® ÇØÁà¾ßµÊ
+    TheChar->Exp = TargetData->Exp;
 
 }
 
@@ -342,7 +358,7 @@ void URPGGameInstance::UpdateCharSkillToDepot(APlayerController* PC, const FStri
     URPGGameInstance* GI = Cast<URPGGameInstance>(PC->GetGameInstance());
     GI->UpdateCharSkill(TargetData->Skills);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
-    //TheChar -
+    TheChar->Skills = TargetData->Skills;
 }
 
 void URPGGameInstance::UpdateCharJobToDepot(APlayerController* PC, const EClassType& NewClass)
@@ -382,7 +398,51 @@ void URPGGameInstance::UpdateCharStatusToDepot(APlayerController* PC, const FSta
     URPGGameInstance* GI = Cast<URPGGameInstance>(PC->GetGameInstance());
     GI->UpdateCharStatus(CharData->Status);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
-    //TheChar -
+    TheChar->Status = CharData->Status;
+}
+
+void URPGGameInstance::UpdateCharHPToDepot(APlayerController* PC, const float& HPIncrease)
+{
+    if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
+
+    if (!PC) return;
+    FCharData* TargetData = CharDataDepot.Find(PC);
+
+    if (TargetData == nullptr) return;
+
+    TargetData->HP = TargetData->HP + HPIncrease;
+    TargetData->SetDirty(ECharacterDirtyFlags::EDF_HP);
+    URPGGameInstance* GI = Cast<URPGGameInstance>(PC->GetGameInstance());
+    GI->UpdateCharHP(TargetData->HP);
+    AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
+    if (!(TheChar->ConditionComponent))
+    {
+        return;
+    }
+    TheChar->ConditionComponent->HP = TargetData->HP;
+    
+}
+
+void URPGGameInstance::UpdateCharMPToDepot(APlayerController* PC, const float& MPIncrease)
+{
+    if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
+
+    if (!PC) return;
+    FCharData* TargetData = CharDataDepot.Find(PC);
+
+    if (TargetData == nullptr) return;
+
+    TargetData->HP = TargetData->MP + MPIncrease;
+    TargetData->SetDirty(ECharacterDirtyFlags::EDF_MP);
+    URPGGameInstance* GI = Cast<URPGGameInstance>(PC->GetGameInstance());
+    GI->UpdateCharHP(TargetData->MP);
+    AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
+    if (!(TheChar->ConditionComponent))
+    {
+        return;
+    }
+    TheChar->ConditionComponent->MP = TargetData->MP;
+    
 }
 
 void URPGGameInstance::RegisterPlayer(APlayerController* PC, const FString& InId)

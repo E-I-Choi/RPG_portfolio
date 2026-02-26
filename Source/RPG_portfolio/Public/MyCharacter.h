@@ -6,19 +6,6 @@
 #include "CharConditionComponent.h"
 #include "MyCharacter.generated.h"
 
-UENUM()
-enum class EOnRepType : uint8
-{
-	CharName,
-	Equips,
-	Weapon,
-	Hat,
-	Top,
-	Pants,
-	Shoes,
-	Job,
-	Exp
-};
 class UMyConditionComponent;
 
 UCLASS()
@@ -40,8 +27,6 @@ public:
 	FString CharName = TEXT("Name");
 	UPROPERTY(ReplicatedUsing = OnRep_CharExp, BlueprintReadOnly, Category = "RPG/Character")
 	float Exp = 1.f;
-	UPROPERTY(ReplicatedUsing = OnRep_CharEquips, BlueprintReadOnly, Category = "RPG/Character")
-	FEquips Equips;
 	UPROPERTY(ReplicatedUsing = OnRep_CharWeapon, BlueprintReadOnly, Category = "RPG/Character")
 	EWeaponType Weapon = EWeaponType::none;
 	UPROPERTY(ReplicatedUsing = OnRep_CharHat, BlueprintReadOnly, Category = "RPG/Character")
@@ -54,6 +39,10 @@ public:
 	EFootsType Shoes = EFootsType::none;
 	UPROPERTY(ReplicatedUsing = OnRep_CharJob, BlueprintReadOnly, Category = "RPG/Character")
 	EClassType Job = EClassType::none;
+	UPROPERTY(ReplicatedUsing = OnRep_CharSkills, BlueprintReadOnly, Category = "RPG/Character")
+	TArray<FString> Skills;
+	UPROPERTY(ReplicatedUsing = OnRep_CharStatus, BlueprintReadOnly, Category = "RPG/Character")
+	FStatus Status;
 
 public:	
 	// Called every frame
@@ -80,8 +69,6 @@ protected:
 	UFUNCTION()
 	void OnRep_CharExp();
 	UFUNCTION()
-	void OnRep_CharEquips();
-	UFUNCTION()
 	void OnRep_CharWeapon();
 	UFUNCTION()
 	void OnRep_CharHat();
@@ -93,6 +80,10 @@ protected:
 	void OnRep_CharShoes();
 	UFUNCTION()
 	void OnRep_CharJob();
+	UFUNCTION()
+	void OnRep_CharSkills();
+	UFUNCTION()
+	void OnRep_CharStatus();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Event")
 	void OnRepEvent(EOnRepType RepType);
 };

@@ -22,19 +22,30 @@ void UCharConditionComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 void UCharConditionComponent::OnRep_HP()
 {
 	OnStatChanged.Broadcast(EUIStatType::HP, HP);
-	OnCharDataChanged.Broadcast();
+	OnCharDataChanged.Broadcast(EOnRepType::HP);
 }
 
 void UCharConditionComponent::OnRep_MP()
 {
 	OnStatChanged.Broadcast(EUIStatType::MP, MP);
-	OnCharDataChanged.Broadcast();
+	OnCharDataChanged.Broadcast(EOnRepType::MP);
 }
 
 void UCharConditionComponent::OnRep_LV()
 {
 	OnStatChanged.Broadcast(EUIStatType::Level, Level);
-	OnCharDataChanged.Broadcast();
+	OnCharDataChanged.Broadcast(EOnRepType::Level);
+}
+
+void UCharConditionComponent::BroadcastMyPawnChangeWithValidation(EOnRepType Type)
+{
+	if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
+	{
+		if (OwnerPawn && OwnerPawn->IsLocallyControlled())
+		{
+			OnMyCharDataChanged.Broadcast(Type);
+		}
+	}
 }
 
 

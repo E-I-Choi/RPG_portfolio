@@ -62,13 +62,14 @@ void AMyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 	DOREPLIFETIME(AMyCharacter, CharName);
 	DOREPLIFETIME(AMyCharacter, Exp);
-	DOREPLIFETIME(AMyCharacter, Equips);
 	DOREPLIFETIME(AMyCharacter, Weapon);
 	DOREPLIFETIME(AMyCharacter, Hat);
 	DOREPLIFETIME(AMyCharacter, Top);
 	DOREPLIFETIME(AMyCharacter, Pants);
 	DOREPLIFETIME(AMyCharacter, Shoes);
 	DOREPLIFETIME(AMyCharacter, Job);
+	DOREPLIFETIME(AMyCharacter, Skills);
+	DOREPLIFETIME(AMyCharacter, Status);
 }
 
 // Called every frame
@@ -83,7 +84,7 @@ void AMyCharacter::OnRep_CharName()
 	OnRepEvent(EOnRepType::CharName);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::CharName);
 	}
 }
 
@@ -92,16 +93,7 @@ void AMyCharacter::OnRep_CharExp()
 	OnRepEvent(EOnRepType::Exp);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
-	}
-}
-
-void AMyCharacter::OnRep_CharEquips()
-{
-	OnRepEvent(EOnRepType::Equips);
-	if (ConditionComponent)
-	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Exp);
 	}
 }
 
@@ -110,7 +102,7 @@ void AMyCharacter::OnRep_CharWeapon()
 	OnRepEvent(EOnRepType::Weapon);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Weapon);
 	}
 }
 
@@ -119,7 +111,7 @@ void AMyCharacter::OnRep_CharHat()
 	OnRepEvent(EOnRepType::Hat);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Hat);
 	}
 }
 
@@ -128,7 +120,7 @@ void AMyCharacter::OnRep_CharTop()
 	OnRepEvent(EOnRepType::Top);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Top);
 	}
 }
 
@@ -137,7 +129,7 @@ void AMyCharacter::OnRep_CharPants()
 	OnRepEvent(EOnRepType::Pants);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Pants);
 	}
 }
 
@@ -146,7 +138,7 @@ void AMyCharacter::OnRep_CharShoes()
 	OnRepEvent(EOnRepType::Shoes);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Shoes);
 	}
 }
 
@@ -155,6 +147,24 @@ void AMyCharacter::OnRep_CharJob()
 	OnRepEvent(EOnRepType::Job);
 	if (ConditionComponent)
 	{
-		ConditionComponent->OnCharDataChanged.Broadcast();
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Job);
+	}
+}
+
+void AMyCharacter::OnRep_CharSkills()
+{
+	OnRepEvent(EOnRepType::Skills);
+	if (ConditionComponent)
+	{
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Skills);
+	}
+}
+
+void AMyCharacter::OnRep_CharStatus()
+{
+	OnRepEvent(EOnRepType::Status);
+	if (ConditionComponent)
+	{
+		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Status);
 	}
 }

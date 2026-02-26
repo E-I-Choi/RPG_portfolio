@@ -13,6 +13,24 @@ enum class EClassType : uint8
 	warrior UMETA(DisplayName = "Warrior")
 };
 
+UENUM()
+enum class EOnRepType : uint8
+{
+	CharName,
+	Weapon,
+	Hat,
+	Top,
+	Pants,
+	Shoes,
+	Job,
+	Exp,
+	Skills,
+	HP,
+	MP,
+	Level,
+	Status
+};
+
 UENUM(BlueprintType)
 enum class EWeaponType :uint8
 {
@@ -114,12 +132,14 @@ enum ECharacterDirtyFlags
 {
 	EDF_None = 0,
 	EDF_Name = 1,
-	EDF_Level = 1<<1,
-	EDF_Exp = 1<<2,
-	EDF_Equips = 1<<3,
-	EDF_Skills = 1<<4,
-	EDF_Job = 1<<5,
-	EDF_Status = 1<<6
+	EDF_Level = 1 << 1,
+	EDF_Exp = 1 << 2,
+	EDF_Equips = 1 << 3,
+	EDF_Skills = 1 << 4,
+	EDF_Job = 1 << 5,
+	EDF_Status = 1 << 6,
+	EDF_HP = 1 << 7,
+	EDF_MP = 1<<8
 };
 
 USTRUCT(BlueprintType)
@@ -142,6 +162,10 @@ public:
 	EClassType Job;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
 	FStatus Status;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
+	float HP = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
+	float MP = 0.f;
 
 	uint8 DirtyBits = 0;
 	bool IsDirty(ECharacterDirtyFlags Flag) const { return  (DirtyBits & Flag) != 0 ; }

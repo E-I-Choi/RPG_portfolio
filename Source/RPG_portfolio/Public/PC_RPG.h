@@ -35,6 +35,10 @@ public:
 	void Server_ReqUpdateJob(const EClassType InJob);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdateStatus(const FStatus StatIncrease);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqUpdateHP(const float HPIncrease);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqUpdateMP(const float MPIncrease);
 	
 
 };

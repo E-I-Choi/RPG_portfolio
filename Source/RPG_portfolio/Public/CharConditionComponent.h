@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "GameTypes.h"
 #include "CharConditionComponent.generated.h"
 
 
@@ -15,7 +16,8 @@ enum class EUIStatType : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, EUIStatType, StatType, float, NewValue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharDataChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharDataChanged, EOnRepType, RepType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMyCharDataChanged, EOnRepType, RepType);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class RPG_PORTFOLIO_API UCharConditionComponent : public UActorComponent
@@ -31,6 +33,8 @@ public:
 	FOnStatChanged OnStatChanged;
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCharDataChanged OnCharDataChanged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnMyCharDataChanged OnMyCharDataChanged;
 
 	UPROPERTY(ReplicatedUsing = OnRep_HP, BlueprintReadOnly, Category = "RPG/Character/UI")
 	float HP = 100.f;
@@ -45,11 +49,8 @@ public:
 	void OnRep_MP();
 	UFUNCTION()
 	void OnRep_LV();
-
-
-	void SetHP(float NewHP) { HP = NewHP;}
-	void SetMP(float NewMP) { MP = NewMP;}
-	void SetLevel(int32 NewLV) { Level = NewLV; }
+	UFUNCTION()
+	void BroadcastMyPawnChangeWithValidation(EOnRepType Type);
 
 
 
