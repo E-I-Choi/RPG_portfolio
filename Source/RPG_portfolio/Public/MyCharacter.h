@@ -23,8 +23,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 
-	UPROPERTY(ReplicatedUsing = OnRep_CharName, BlueprintReadOnly , Category = "RPG/Character")
-	FString CharName = TEXT("Name");
+	
 	UPROPERTY(ReplicatedUsing = OnRep_CharExp, BlueprintReadOnly, Category = "RPG/Character")
 	float Exp = 1.f;
 	UPROPERTY(ReplicatedUsing = OnRep_CharWeapon, BlueprintReadOnly, Category = "RPG/Character")
@@ -64,8 +63,7 @@ private:
 	class USpringArmComponent* CameraBoom;
 
 protected:
-	UFUNCTION()
-	void OnRep_CharName();
+	
 	UFUNCTION()
 	void OnRep_CharExp();
 	UFUNCTION()

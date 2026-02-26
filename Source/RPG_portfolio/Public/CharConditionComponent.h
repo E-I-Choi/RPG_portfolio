@@ -12,10 +12,11 @@ enum class EUIStatType : uint8
 {
 	HP,
 	MP,
-	Level
+	Level,
+	Name
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStatChanged, EUIStatType, StatType, float, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnConditionChanged, EUIStatType, StatType, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharDataChanged, EOnRepType, RepType);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMyCharDataChanged, EOnRepType, RepType);
 
@@ -29,13 +30,16 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+
 	UPROPERTY(BlueprintAssignable, Category = "Events")
-	FOnStatChanged OnStatChanged;
+	FOnConditionChanged OnConditionChanged;
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCharDataChanged OnCharDataChanged;
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnMyCharDataChanged OnMyCharDataChanged;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CharName, BlueprintReadOnly, Category = "RPG/Character")
+	FString CharName = TEXT("Name");
 	UPROPERTY(ReplicatedUsing = OnRep_HP, BlueprintReadOnly, Category = "RPG/Character/UI")
 	float HP = 100.f;
 	UPROPERTY(ReplicatedUsing = OnRep_MP, BlueprintReadOnly, Category = "RPG/Character/UI")
@@ -43,6 +47,9 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_LV, BlueprintReadOnly, Category = "RPG/Character/UI")
 	int32 Level = 1;
 
+protected:
+	UFUNCTION()
+	void OnRep_CharName();
 	UFUNCTION()
 	void OnRep_HP();
 	UFUNCTION()
@@ -52,10 +59,6 @@ public:
 	UFUNCTION()
 	void BroadcastMyPawnChangeWithValidation(EOnRepType Type);
 
-
-
-protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	

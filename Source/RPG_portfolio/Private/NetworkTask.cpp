@@ -4,6 +4,7 @@
 #include "Dom/JsonValue.h"
 
 #include "BPFL_Character.h"
+#include "PC_Lobby.h"
 
 #include "NetworkResponseInterface.h"
 
@@ -104,7 +105,8 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 
 				if (this->RequestorPC.IsValid())
 				{
-					INetworkResponseInterface::Execute_ReceiveCharacterList(this->RequestorPC.Get(), ExtractedCharacters);
+					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
+					LobbyPC->ReceiveCharacterList(ExtractedCharacters);
 				}
 
 				this->FinishTask(true);

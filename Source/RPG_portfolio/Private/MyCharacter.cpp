@@ -60,7 +60,6 @@ void AMyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AMyCharacter, CharName);
 	DOREPLIFETIME(AMyCharacter, Exp);
 	DOREPLIFETIME(AMyCharacter, Weapon);
 	DOREPLIFETIME(AMyCharacter, Hat);
@@ -79,14 +78,6 @@ void AMyCharacter::Tick(float DeltaTime)
 
 }
 
-void AMyCharacter::OnRep_CharName()
-{
-	OnRepEvent(EOnRepType::CharName);
-	if (ConditionComponent)
-	{
-		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::CharName);
-	}
-}
 
 void AMyCharacter::OnRep_CharExp()
 {

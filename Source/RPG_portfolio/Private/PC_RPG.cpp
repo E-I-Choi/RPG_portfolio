@@ -111,3 +111,30 @@ bool APC_RPG::Server_ReqUpdateMP_Validate(const float MPIncrease)
 {
 	return true;
 }
+
+FCharData APC_RPG::GetCharData()
+{
+	FCharData CharData;
+	AMyCharacter* MyPawn = Cast<AMyCharacter>(GetPawn());
+	FCharData GICharData = Cast<URPGGameInstance>(GetGameInstance())->CurrentChar;
+	FEquips CurrentEquips;
+	CurrentEquips.Hat = MyPawn->Hat;
+	CurrentEquips.Pants = MyPawn->Pants;
+	CurrentEquips.Shoes = MyPawn->Shoes;
+	CurrentEquips.Top = MyPawn->Top;
+	CurrentEquips.Weapon = MyPawn->Weapon;
+	CharData.Equips= CurrentEquips;
+	CharData.Exp = MyPawn->Exp;
+	CharData.HP = MyPawn->ConditionComponent->HP;
+	CharData.Job = MyPawn->Job;
+	CharData.Level = MyPawn->ConditionComponent->Level;
+	CharData.MP = MyPawn->ConditionComponent->MP;
+	CharData.Name = MyPawn->ConditionComponent->CharName;
+	CharData.SetItemInstanceId(GICharData.GetItemInstanceId());
+	CharData.Skills = MyPawn->Skills;
+	CharData.Status = MyPawn->Status;
+	CharData.LocX = FMath::CeilToInt32(MyPawn->GetActorLocation().X);
+	CharData.LocY = FMath::CeilToInt32(MyPawn->GetActorLocation().Y);
+	CharData.LocZ = FMath::CeilToInt32(MyPawn->GetActorLocation().Z);
+	return CharData;
+}

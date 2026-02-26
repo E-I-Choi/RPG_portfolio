@@ -25,8 +25,5 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "Network")
 	void ReceiveNetResponse(const FNetworkReturnResult& Result);
-
-	UFUNCTION(BlueprintNativeEvent, Category = "Network")
-	void ReceiveCharacterList(const TArray<FCharData>& InCharacters);
 	
 };

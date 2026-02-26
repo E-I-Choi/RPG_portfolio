@@ -1,4 +1,5 @@
 #include "GM_Lobby.h"
+#include "RPGGameInstance.h"""
 #include "PC_Lobby.h"
 
 AGM_Lobby::AGM_Lobby()
@@ -13,8 +14,9 @@ void AGM_Lobby::PostLogin(APlayerController* NewPlayer)
 
 	if (LobbyPC)
 	{
-		LobbyPC->Client_NotifyJoinedLobby();
 		UE_LOG(LogTemp, Log, TEXT("Server: Player Joined. Sending Load Request..."));
+		URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+		GI->LoadAllCharactersFromServer(LobbyPC);
 	}
 
 }

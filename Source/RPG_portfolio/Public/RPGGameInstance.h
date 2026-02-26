@@ -45,7 +45,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnSystemMessageLog OnSystemMessageLog;
 	UFUNCTION(BlueprintCallable, Category = "System")
-	void BroadcastSystemMessage(const FString& Message, ELogSeverity Severity = ELogSeverity::Log);
+	void BroadcastSystemMessage(APlayerController* RequestorPC, const FString& Message, ELogSeverity Severity = ELogSeverity::Log);
 
 	/** Indicates whether CurrentChar contains valid, selected data. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
@@ -88,24 +88,6 @@ private:
 	void InitServerPlayFab();
 	UFUNCTION(BlueprintCallable, Category = "RPG/Data")
 	void SetEntityInfo(const FString& InId, const FString& InType);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharName(const FString& InName);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharExp(const float& ExpIncrease);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharLevel(const int32& LevelIncrease);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharEquip(const FEquips& InEquips);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharSkill(const TArray<FString>& InSkills);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharJob(const EClassType& NewClass);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharStatus(const FStatus& StatIncrease);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharHP(const float& NewHP);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void UpdateCharMP(const float& NewMP);
 
 
 	UFUNCTION()
@@ -128,7 +110,5 @@ private:
 	void UpdateCharMPToDepot(APlayerController* PC, const float& MPIncrease);
 	UFUNCTION()
 	void RegisterPlayer(APlayerController* PC, const FString& InId);
-	UFUNCTION()
-	void CleanUpCharData(APlayerController* PC);
 };
 

@@ -22,11 +22,18 @@ class RPG_PORTFOLIO_API APC_Lobby : public APlayerController, public INetworkRes
 public: 
 	FOnCharListUpdated OnCharListUpdated;
 
-	virtual void ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result) override;
-	virtual void ReceiveCharacterList_Implementation(const TArray<FCharData>& InCharacters) override;
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqCreateNewChar();
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqLoadAllCharacters();
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqDeleteCharacter(); // 여기엔 식별 인자 필요함
 
+	virtual void ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result) override;
 	UFUNCTION(Client, Reliable)
-	void Client_NotifyJoinedLobby();
+	void ReceiveCharacterList(const TArray<FCharData>& InCharacters);
+	UFUNCTION(Client, Reliable)
+	void PostLoginLoadCharacters();
 
 	UFUNCTION(BlueprintNativeEvent)
 	void OnJoinedLobbyServer();

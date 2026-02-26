@@ -126,9 +126,11 @@ public:
 	{
 	}
 };
+
+
 /*현재는 FCharData& Data 전체의 Dirty 여부만 판별하여 Data를 전부 업데이트 Or No 구조이지만
 확장성을 고려하여 DirtyFlag는 각 멤버별로 Dirty를 판별할 수 있도록 지정해 둠*/
-enum ECharacterDirtyFlags
+/*enum ECharacterDirtyFlags
 {
 	EDF_None = 0,
 	EDF_Name = 1,
@@ -140,8 +142,8 @@ enum ECharacterDirtyFlags
 	EDF_Status = 1 << 6,
 	EDF_HP = 1 << 7,
 	EDF_MP = 1<<8
-};
-
+}; 항상 저장으로 노선을 변경했기에 Dirtybit 비활성화 */
+/**/
 USTRUCT(BlueprintType)
 struct FCharData
 {
@@ -166,11 +168,18 @@ public:
 	float HP = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
 	float MP = 0.f;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
+	int32 LocX = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
+	int32 LocY = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/Character")
+	int32 LocZ = 0;
+	/*
 	uint8 DirtyBits = 0;
 	bool IsDirty(ECharacterDirtyFlags Flag) const { return  (DirtyBits & Flag) != 0 ; }
 	void SetDirty(ECharacterDirtyFlags Flag) { DirtyBits |= Flag; }
-	void ClearDirty() { DirtyBits = 0; }
+	void ClearDirty() { DirtyBits = 0; } 
+	*/
 
 	void SetItemInstanceId(FString InId) { ItemInstanceId = InId; }
 	FString GetItemInstanceId() { return ItemInstanceId; }

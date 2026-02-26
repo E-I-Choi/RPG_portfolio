@@ -7,6 +7,7 @@
 #include "C:\EunIl\Unreal\Projects\C++\MultiPlay\RPG_portfolio\Source\RPG_portfolio\RPG_portfolioPlayerController.h"
 
 #include "GameTypes.h"
+#include "MyCharacter.h"
 
 #include "PC_RPG.generated.h"
 
@@ -39,6 +40,8 @@ public:
 	void Server_ReqUpdateHP(const float HPIncrease);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdateMP(const float MPIncrease);
+	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
+	FCharData GetCharData();
 	
 
 };

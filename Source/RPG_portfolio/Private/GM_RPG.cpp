@@ -28,11 +28,15 @@ void AGM_RPG::Logout(AController* Exiting)
 {
 	Super::Logout(Exiting);
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	FCharData UserCharData = Cast<URPGGameInstance>(Exiting->GetGameInstance())->GetCurrentChar();
 	APlayerController* PC = Cast<APlayerController>(Exiting);
 
 	if (PC)
 	{
+		APC_RPG* ThePC = Cast<APC_RPG>(PC);
+		if (ThePC)
+		{
+			GI->SaveCharacterToServer(PC, ThePC->GetCharData());
+		}
 		GI->CharDataDepot.Remove(PC);
 	}
 }
@@ -48,10 +52,6 @@ void AGM_RPG::SaveAllDirtyPlayerData()
 	{
 		APlayerController* PC = Elem.Key;
 		FCharData& Data = Elem.Value;
-
-		if (Data.DirtyBits != 0)
-		{
-			GI->SaveCharacterToServer(PC, Data);
-		}
+		GI->SaveCharacterToServer(PC, Data);
 	}
 }
