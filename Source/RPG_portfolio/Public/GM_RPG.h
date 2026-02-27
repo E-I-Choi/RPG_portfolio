@@ -25,6 +25,7 @@ protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
+	//Dirty라고 명명했지만 현재 Dirty 판별은 사용하지 않고 언제나 Save 실행함
 	void SaveAllDirtyPlayerData();
 
 	FTimerHandle SaveTimerHandle;

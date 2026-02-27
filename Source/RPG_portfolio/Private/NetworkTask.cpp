@@ -5,8 +5,7 @@
 
 #include "BPFL_Character.h"
 #include "PC_Lobby.h"
-
-#include "NetworkResponseInterface.h"
+#include "PC_RPG.h"
 
 void UNetworkTask::InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requestor, ENetConnectionType Type, FString InContext, float InTimeLimit, int32 InTicketId)
 {
@@ -106,8 +105,14 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 				if (this->RequestorPC.IsValid())
 				{
 					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
-					LobbyPC->ReceiveCharacterList(ExtractedCharacters);
+					
+					if (LobbyPC)
+					{
+						LobbyPC->ReceiveCharacterList(ExtractedCharacters);
+						LobbyPC->ReceiveNetResponse(MyReturn);
+					}
 				}
+
 
 				this->FinishTask(true);
 			}),
@@ -125,7 +130,11 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 
 				if (this->RequestorPC.IsValid())
 				{
-					INetworkResponseInterface::Execute_ReceiveNetResponse(this->RequestorPC.Get(), MyReturn);
+					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
+					if (LobbyPC)
+					{
+						LobbyPC->ReceiveNetResponse(MyReturn);
+					}
 				}
 
 				this->FinishTask(false);
@@ -176,7 +185,11 @@ void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityTyp
 
 			if (this->RequestorPC.IsValid())
 			{
-				INetworkResponseInterface::Execute_ReceiveNetResponse(this->RequestorPC.Get(), MyReturn);
+				APC_RPG* RPGPC = Cast<APC_RPG>(RequestorPC);
+				if (RPGPC)
+				{
+					RPGPC->ReceiveNetResponse(MyReturn);
+				}
 			}
 
             this->FinishTask(true);
@@ -195,7 +208,11 @@ void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityTyp
 
 			if (this->RequestorPC.IsValid())
 			{
-				INetworkResponseInterface::Execute_ReceiveNetResponse(this->RequestorPC.Get(), MyReturn);
+				APC_RPG* RPGPC = Cast<APC_RPG>(RequestorPC);
+				if (RPGPC)
+				{
+					RPGPC->ReceiveNetResponse(MyReturn);
+				}
 			}
             this->FinishTask(false);
         })
@@ -242,13 +259,30 @@ void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InEntityT
 
 				if (this->RequestorPC.IsValid())
 				{
-					INetworkResponseInterface::Execute_ReceiveNetResponse(this->RequestorPC.Get(), MyReturn);
+					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
+					if (LobbyPC)
+					{
+						LobbyPC->ReceiveNetResponse(MyReturn);
+					}
 				}
 				this->FinishTask(true);
 
 			}),
 		PlayFab::FPlayFabErrorDelegate::CreateLambda([this](const PlayFab::FPlayFabCppError& Error)
 			{
+				if (!(CurrentState == ETaskState::InFlight)) return;
+				FNetworkReturnResult MyReturn;
+				MyReturn.Response = ENetResponseType::Failed;
+				MyReturn.Type = ENetConnectionType::NewCharacter;
+
+				if (this->RequestorPC.IsValid())
+				{
+					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
+					if (LobbyPC)
+					{
+						LobbyPC->ReceiveNetResponse(MyReturn);
+					}
+				}
 				this->FinishTask(false);
 			})
 	);

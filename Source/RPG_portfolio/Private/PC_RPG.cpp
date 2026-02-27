@@ -5,12 +5,8 @@
 
 void APC_RPG::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
 {
-	switch (Result.Type)
-	{
-	default: break;
-	case ENetConnectionType::SaveCharacters:
-		return;
-	}
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	GI->OnSystemMessageLog.Broadcast(Result.Context, GI->GetSeverity(Result));
 }
 
 bool APC_RPG::Server_ReqUpdateSkill_Validate(const FString& InSkill, const bool bIsRemove)
@@ -112,10 +108,23 @@ bool APC_RPG::Server_ReqUpdateMP_Validate(const float MPIncrease)
 	return true;
 }
 
+bool APC_RPG::Server_ReqUpdateLocation_Validate(const int32 X, const int32 Y, const int32 Z)
+{
+	return true;
+}
+
+void APC_RPG::Server_ReqUpdateLocation_Implementation(const int32 X, const int32 Y, const int32 Z)
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	AMyCharacter* MyPawn = Cast<AMyCharacter>(GetPawn());
+	GI->UpdateCharLocationToDepot(this, FMath::CeilToInt32(MyPawn->GetActorLocation().X), FMath::CeilToInt32(MyPawn->GetActorLocation().Y), FMath::CeilToInt32(MyPawn->GetActorLocation().Z));
+}
+
 FCharData APC_RPG::GetCharData()
 {
 	FCharData CharData;
 	AMyCharacter* MyPawn = Cast<AMyCharacter>(GetPawn());
+	if (!MyPawn) return CharData;
 	FCharData GICharData = Cast<URPGGameInstance>(GetGameInstance())->CurrentChar;
 	FEquips CurrentEquips;
 	CurrentEquips.Hat = MyPawn->Hat;

@@ -109,6 +109,10 @@ private:
 	UFUNCTION()
 	void UpdateCharMPToDepot(APlayerController* PC, const float& MPIncrease);
 	UFUNCTION()
+	void UpdateCharLocationToDepot(APlayerController* PC, const int32& X, const int32& Y, const int32& Z);
+	UFUNCTION()
 	void RegisterPlayer(APlayerController* PC, const FString& InId);
+	UFUNCTION()
+	ELogSeverity GetSeverity(FNetworkReturnResult Result);
 };
 

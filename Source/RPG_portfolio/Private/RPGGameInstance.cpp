@@ -355,9 +355,60 @@ void URPGGameInstance::UpdateCharMPToDepot(APlayerController* PC, const float& M
     
 }
 
+void URPGGameInstance::UpdateCharLocationToDepot(APlayerController* PC, const int32& X, const int32& Y, const int32& Z)
+{
+    if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
+
+    if (!PC) return;
+    FCharData* TargetData = CharDataDepot.Find(PC);
+
+    if (TargetData == nullptr) return;
+
+    TargetData->LocX = X;
+    TargetData->LocY = Y;
+    TargetData->LocZ = Z;
+}
+
 void URPGGameInstance::RegisterPlayer(APlayerController* PC, const FString& InId)
 {
     FCharData NewData;
     NewData.SetItemInstanceId(InId);
     CharDataDepot.Add(PC, NewData);
+}
+
+ELogSeverity URPGGameInstance::GetSeverity(FNetworkReturnResult Result)
+{
+    ELogSeverity Severity;
+    switch (Result.Type)
+    {
+    default:break;
+    case ENetConnectionType::NewCharacter:
+        if (Result.Response == ENetResponseType::Success)
+        {
+            Severity = ELogSeverity::Log;
+        }
+        else
+        {
+            Severity = ELogSeverity::Warning;
+        }
+    case ENetConnectionType::LoadCharacters:
+        if (Result.Response == ENetResponseType::Success)
+        {
+            Severity = ELogSeverity::Log;
+        }
+        else
+        {
+            Severity = ELogSeverity::Error;
+        }
+    case ENetConnectionType::SaveCharacters:
+        if (Result.Response == ENetResponseType::Success)
+        {
+            Severity = ELogSeverity::Log;
+        }
+        else
+        {
+            Severity = ELogSeverity::Error;
+        }
+    }
+    return Severity;
 }

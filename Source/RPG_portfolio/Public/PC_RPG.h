@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "NetworkResponseInterface.h"
 #include "CoreMinimal.h"
 #include "C:\EunIl\Unreal\Projects\C++\MultiPlay\RPG_portfolio\Source\RPG_portfolio\RPG_portfolioPlayerController.h"
 
@@ -15,13 +14,13 @@
 
 
 UCLASS()
-class RPG_PORTFOLIO_API APC_RPG : public ARPG_portfolioPlayerController, public INetworkResponseInterface
+class RPG_PORTFOLIO_API APC_RPG : public ARPG_portfolioPlayerController
 {
 	GENERATED_BODY()
 
 public:
-	virtual void ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result) override;
-
+	UFUNCTION(Client, Reliable)
+	void ReceiveNetResponse(const FNetworkReturnResult& Result);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdatName(const FString& NewName);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
@@ -40,6 +39,8 @@ public:
 	void Server_ReqUpdateHP(const float HPIncrease);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdateMP(const float MPIncrease);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqUpdateLocation(const int32 X, const int32 Y, const int32 Z);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	FCharData GetCharData();
 	

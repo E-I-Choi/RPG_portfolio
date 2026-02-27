@@ -53,5 +53,9 @@ void AGM_RPG::SaveAllDirtyPlayerData()
 		APlayerController* PC = Elem.Key;
 		FCharData& Data = Elem.Value;
 		GI->SaveCharacterToServer(PC, Data);
+		if (!PC)
+		{
+			GI->CharDataDepot.Remove(PC);
+		}
 	}
 }

@@ -7,15 +7,15 @@
 
 
 
-bool APC_Lobby::Server_ReqCreateNewChar_Validate()
+bool APC_Lobby::Server_ReqCreateNewChar_Validate(const EClassType& InJob, const FString& InName)
 {
 	return true;
 }
 
-void APC_Lobby::Server_ReqCreateNewChar_Implementation()
+void APC_Lobby::Server_ReqCreateNewChar_Implementation(const EClassType& InJob, const FString& InName)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->CreateNewCharacter(this);
+	GI->CreateNewCharacter(this, InJob, InName);
 }
 
 bool APC_Lobby::Server_ReqLoadAllCharacters_Validate()
@@ -44,6 +44,7 @@ void APC_Lobby::Server_ReqDeleteCharacter_Implementation()
 
 void APC_Lobby::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
 {
+
 	switch (Result.Type)
 	{
 	default: break;
@@ -54,7 +55,9 @@ void APC_Lobby::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Re
 		}
 		break;
 	}
-	return;
+
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	GI->OnSystemMessageLog.Broadcast(Result.Context, GI->GetSeverity(Result));
 }
 
 void APC_Lobby::PostLoginLoadCharacters_Implementation()
@@ -68,11 +71,6 @@ void APC_Lobby::ReceiveCharacterList_Implementation(const TArray<FCharData>& InC
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
 	GI->Characters = InCharacters;
 	OnCharListUpdated.Broadcast();
-	OnJoinedLobbyServer();
-}
-
-void APC_Lobby::OnJoinedLobbyServer_Implementation()
-{
 }
 
 

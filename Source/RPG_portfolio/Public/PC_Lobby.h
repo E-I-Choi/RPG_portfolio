@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "NetworkResponseInterface.h"
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 
@@ -14,27 +13,28 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharListUpdated);
 
 
 UCLASS()
-class RPG_PORTFOLIO_API APC_Lobby : public APlayerController, public INetworkResponseInterface
+class RPG_PORTFOLIO_API APC_Lobby : public APlayerController
 {
 	GENERATED_BODY()
 	
 
 public: 
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnCharListUpdated OnCharListUpdated;
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqCreateNewChar();
+	void Server_ReqCreateNewChar(const EClassType& InJob, const FString& InName);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqLoadAllCharacters();
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqDeleteCharacter(); // 여기엔 식별 인자 필요함
+	void Server_ReqDeleteCharacter(); // 사용하지 않음
 
-	virtual void ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result) override;
+	UFUNCTION(Client, Reliable)
+	void ReceiveNetResponse(const FNetworkReturnResult& Result);
 	UFUNCTION(Client, Reliable)
 	void ReceiveCharacterList(const TArray<FCharData>& InCharacters);
 	UFUNCTION(Client, Reliable)
 	void PostLoginLoadCharacters();
 
-	UFUNCTION(BlueprintNativeEvent)
-	void OnJoinedLobbyServer();
 };
