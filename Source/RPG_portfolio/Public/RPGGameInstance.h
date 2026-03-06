@@ -78,8 +78,6 @@ private:
 	/** The character data currently selected and controlled by the player. @warning This contains INVALID default values before selection. */
 	UPROPERTY()
 	FCharData CurrentChar;
-	UPROPERTY()
-	int32 CurrentCharIndex = 0;
 	UFUNCTION()
 	UNetworkTask* AddNetworkTask();
 	UFUNCTION()
