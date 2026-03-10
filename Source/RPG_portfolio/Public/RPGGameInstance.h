@@ -87,7 +87,8 @@ private:
 	UFUNCTION(BlueprintCallable, Category = "RPG/Data")
 	void SetEntityInfo(const FString& InId, const FString& InType);
 
-
+	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
+	void SetCurrentChar(const FCharData& InChar) { CurrentChar = InChar; }
 	UFUNCTION()
 	void UpdateCharNameToDepot(APlayerController* PC, const FString& InName);
 	UFUNCTION()

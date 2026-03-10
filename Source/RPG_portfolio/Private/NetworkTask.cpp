@@ -274,6 +274,7 @@ void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InEntityT
 				FNetworkReturnResult MyReturn;
 				MyReturn.Response = ENetResponseType::Failed;
 				MyReturn.Type = ENetConnectionType::NewCharacter;
+				MyReturn.Context = Error.ErrorMessage;
 
 				if (this->RequestorPC.IsValid())
 				{
