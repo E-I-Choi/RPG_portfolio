@@ -53,7 +53,7 @@ void UNetworkTask::ExecuteTimer()
 
 }
 
-void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityType)
+void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
 
 	PlayFabEconomyPtr EconomyAPI = IPlayFabModuleInterface::Get().GetEconomyAPI();
@@ -66,6 +66,7 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 	Request.Entity = MakeShared<PlayFab::EconomyModels::FEntityKey>();
 	Request.Entity->Id = InEntityId;
 	Request.Entity->Type = InEntityType;
+	Request.AuthenticationContext = MakeShareable(InAuthContext);
 
 	Request.Filter = TEXT("ContentType eq 'Character'");
 
@@ -106,10 +107,10 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 				{
 					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
 					
-					if (LobbyPC)
+					if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
 					{
-						LobbyPC->ReceiveCharacterList(ExtractedCharacters);
-						LobbyPC->ReceiveNetResponse(MyReturn);
+						LobbyPC->Client_ReceiveCharacterList(ExtractedCharacters);
+						LobbyPC->Client_ReceiveNetResponse(MyReturn);
 					}
 				}
 
@@ -131,9 +132,9 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 				if (this->RequestorPC.IsValid())
 				{
 					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
-					if (LobbyPC)
+					if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
 					{
-						LobbyPC->ReceiveNetResponse(MyReturn);
+						LobbyPC->Client_ReceiveNetResponse(MyReturn);
 					}
 				}
 
@@ -142,7 +143,7 @@ void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityTyp
 	);
 }
 
-void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityType, FCharData DataToSave)
+void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FCharData DataToSave)
 {
 	PlayFabEconomyPtr EconomyAPI = IPlayFabModuleInterface::Get().GetEconomyAPI();
 	if (!EconomyAPI.IsValid()) return;
@@ -154,6 +155,7 @@ void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityTyp
 	Request.Entity = MakeShared<PlayFab::EconomyModels::FEntityKey>();
 	Request.Entity->Id = InEntityId;
 	Request.Entity->Type = InEntityType;
+	Request.AuthenticationContext = MakeShareable(InAuthContext);
 
 	TSharedRef<PlayFab::EconomyModels::FInventoryItem> ItemToUpdate = MakeShared<PlayFab::EconomyModels::FInventoryItem>();
 
@@ -186,9 +188,9 @@ void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityTyp
 			if (this->RequestorPC.IsValid())
 			{
 				APC_RPG* RPGPC = Cast<APC_RPG>(RequestorPC);
-				if (RPGPC)
+				if (RPGPC && RPGPC->GetNetConnection() != nullptr)
 				{
-					RPGPC->ReceiveNetResponse(MyReturn);
+					RPGPC->Client_ReceiveNetResponse(MyReturn);
 				}
 			}
 
@@ -209,9 +211,9 @@ void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityTyp
 			if (this->RequestorPC.IsValid())
 			{
 				APC_RPG* RPGPC = Cast<APC_RPG>(RequestorPC);
-				if (RPGPC)
+				if (RPGPC && RPGPC->GetNetConnection() != nullptr)
 				{
-					RPGPC->ReceiveNetResponse(MyReturn);
+					RPGPC->Client_ReceiveNetResponse(MyReturn);
 				}
 			}
             this->FinishTask(false);
@@ -219,18 +221,20 @@ void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityTyp
     );
 }
 
-void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InEntityType, FString InName, EClassType InJob)
+void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FString InName, EClassType InJob)
 {
 	PlayFabEconomyPtr EconomyAPI = IPlayFabModuleInterface::Get().GetEconomyAPI();
 	if (!EconomyAPI.IsValid()) return;
 
 	ExecuteTimer();
 
+
 	PlayFab::EconomyModels::FAddInventoryItemsRequest Request;
 
 	Request.Entity = MakeShared<PlayFab::EconomyModels::FEntityKey>();
 	Request.Entity->Id = InEntityId;
 	Request.Entity->Type = InEntityType;
+	Request.AuthenticationContext = MakeShareable(InAuthContext);
 
 	PlayFab::EconomyModels::FInventoryItem ItemPayload;
 	ItemPayload.Id = TEXT("3495eae5-9b95-42c2-9b38-2d3d615286d1");
@@ -260,9 +264,9 @@ void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InEntityT
 				if (this->RequestorPC.IsValid())
 				{
 					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
-					if (LobbyPC)
+					if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
 					{
-						LobbyPC->ReceiveNetResponse(MyReturn);
+						LobbyPC->Client_ReceiveNetResponse(MyReturn);
 					}
 				}
 				this->FinishTask(true);
@@ -279,9 +283,9 @@ void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InEntityT
 				if (this->RequestorPC.IsValid())
 				{
 					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
-					if (LobbyPC)
+					if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
 					{
-						LobbyPC->ReceiveNetResponse(MyReturn);
+						LobbyPC->Client_ReceiveNetResponse(MyReturn);
 					}
 				}
 				this->FinishTask(false);

@@ -3,7 +3,7 @@
 #include "PC_RPG.h"
 #include "RPGGameInstance.h"
 
-void APC_RPG::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
+void APC_RPG::Client_ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
 	GI->OnSystemMessageLog.Broadcast(Result.Context, GI->GetSeverity(Result));
@@ -120,6 +120,29 @@ void APC_RPG::Server_ReqUpdateLocation_Implementation(const int32 X, const int32
 	GI->UpdateCharLocationToDepot(this, FMath::CeilToInt32(MyPawn->GetActorLocation().X), FMath::CeilToInt32(MyPawn->GetActorLocation().Y), FMath::CeilToInt32(MyPawn->GetActorLocation().Z));
 }
 
+void APC_RPG::Server_ReqSaveCharacter_Implementation(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	GI->SaveCharacterToServer(this, InCharData, InEntityId, InEntityType, InAuthContext);
+
+}
+
+bool APC_RPG::Server_ReqSaveCharacter_Validate(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+{
+	return true;
+}
+
+void APC_RPG::Server_RegisterPlayer_Implementation(const FString& InstanceId)
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	GI->RegisterPlayer(this, InstanceId);
+}
+
+bool APC_RPG::Server_RegisterPlayer_Validate(const FString& InstanceId)
+{
+	return true;
+}
+
 FCharData APC_RPG::GetCharData()
 {
 	FCharData CharData;
@@ -146,4 +169,23 @@ FCharData APC_RPG::GetCharData()
 	CharData.LocY = FMath::CeilToInt32(MyPawn->GetActorLocation().Y);
 	CharData.LocZ = FMath::CeilToInt32(MyPawn->GetActorLocation().Z);
 	return CharData;
+}
+
+void APC_RPG::Client_ReceiveReqSaveCharacter_Implementation()
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	Server_ReqSaveCharacter(GetCharData(), GI->GetEntityId(), GI->GetEntityType(), GI->MyAuthContext);
+}
+
+void APC_RPG::Client_ReceiveReqSaveCharacterWithData_Implementation(const FCharData& InCharData)
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	Server_ReqSaveCharacter(InCharData, GI->GetEntityId(), GI->GetEntityType(), GI->MyAuthContext);
+}
+
+void APC_RPG::Client_ReceiveReqRegisterPlayer_Implementation()
+{
+	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+	FCharData TheCharData = GI->GetCurrentChar();
+	Server_RegisterPlayer(TheCharData.GetItemInstanceId());
 }

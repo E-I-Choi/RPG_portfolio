@@ -38,11 +38,11 @@ public:
 	UFUNCTION()
 	void ExecuteTimer();
 	UFUNCTION()
-	void ExecuteLoadCharacters(FString InEntityId, FString InEntityType);
+	void ExecuteLoadCharacters(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext);
 	UFUNCTION()
-	void ExecuteUpdateCharData(FString InEntityId, FString InEntityType, FCharData DataToSave);
+	void ExecuteUpdateCharData(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FCharData DataToSave);
 	UFUNCTION()
-	void ExecuteGrantNewCharItem(FString InEntityId, FString InEntityType, FString InName, EClassType InJob);
+	void ExecuteGrantNewCharItem(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FString InName, EClassType InJob);
 	ENetConnectionType ConnectionType = ENetConnectionType::none;
 	TWeakObjectPtr<class APlayerController> RequestorPC;
 	

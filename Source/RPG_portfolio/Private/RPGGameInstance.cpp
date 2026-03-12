@@ -56,7 +56,7 @@ void URPGGameInstance::BroadcastSystemMessage(APlayerController* RequestorPC, co
     }
 }
 
-void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const EClassType& InJob, const FString& InName)
+void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName)
 {
     if (!RequestorPC) return;
     if ((GetWorld()->IsNetMode(NM_DedicatedServer))) return;
@@ -64,44 +64,37 @@ void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const 
     UNetworkTask* LoadTask = AddNetworkTask();
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::NewCharacter, TEXT("NewCharacter"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
-    URPGGameInstance* RequestorGI = Cast<URPGGameInstance>(RequestorPC->GetGameInstance());
-    FString EntityId = TEXT("");
-    FString EntityType = TEXT("");
-    if (RequestorGI)
-    {
-        EntityId = RequestorGI->MyEntityId;
-        EntityType = RequestorGI->MyEntityType;
-    }
-
-    LoadTask->ExecuteGrantNewCharItem(EntityId, EntityType, InName, InJob);
+    
+    LoadTask->ExecuteGrantNewCharItem(InEntityId, InEntityType, InAuthContext ,InName, InJob);
 
 	return;
 }
 
-void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorPC)
+void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
-    if (!RequestorPC) return;
-    if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
+    if (!RequestorPC)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InvalidPC"));
+        return;
+    }
+    if (!(GetWorld()->IsNetMode(NM_DedicatedServer)))
+    {
+        UE_LOG(LogTemp, Warning, TEXT("InvalidOwner"));
+        return;
+    }
 
     UNetworkTask* LoadTask = AddNetworkTask();
     
 
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::LoadCharacters, TEXT("CharacterLoad"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
-    URPGGameInstance* RequestorGI = Cast<URPGGameInstance>(RequestorPC->GetGameInstance());
-    FString EntityId = TEXT("");
-    FString EntityType = TEXT("");
-    if (RequestorGI)
-    {
-        EntityId = RequestorGI->MyEntityId;
-        EntityType = RequestorGI->MyEntityType;
-    }
+   
 
-    LoadTask->ExecuteLoadCharacters(EntityId, EntityType);
+    LoadTask->ExecuteLoadCharacters(InEntityId, InEntityType, InAuthContext);
 }
 
 
-void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData)
+void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
 
     if (!RequestorPC) return;
@@ -112,24 +105,17 @@ void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCh
 
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::SaveCharacters, TEXT("CharacterLoad"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
-    URPGGameInstance* RequestorGI = Cast<URPGGameInstance>(RequestorPC->GetGameInstance());
-    FString EntityId = TEXT("");
-    FString EntityType = TEXT("");
-    if (RequestorGI)
-    {
-        EntityId = RequestorGI->MyEntityId;
-        EntityType = RequestorGI->MyEntityType;
-    }
 
-    LoadTask->ExecuteUpdateCharData(EntityId, EntityType, InCharData);
+    LoadTask->ExecuteUpdateCharData(InEntityId, InEntityType, InAuthContext, InCharData);
   
 }
 
-void URPGGameInstance::SetEntityInfo(const FString& InId, const FString& InType)
+void URPGGameInstance::SetEntityInfo(const FString& InId, const FString& InType, UPlayFabAuthenticationContext* InAuthContext)
 {
     if (GetWorld()->IsNetMode(NM_DedicatedServer)) return;
     MyEntityId = InId;
     MyEntityType = InType;
+    MyAuthContext = InAuthContext;
     UE_LOG(LogTemp, Log, TEXT("Entity ID Saved: %s"), *MyEntityId);
 }
 
@@ -146,11 +132,6 @@ void URPGGameInstance::RemoveNetworkTask(UNetworkTask* FinishedTask)
 {
     if (FinishedTask)
     {
-        if (FinishedTask->ConnectionType == ENetConnectionType::NewCharacter)
-        { //캐릭터 생성 이후 다시 캐릭터 목록 업데이트. 대형 프로젝트가 될 경우 효율을 고려하여
-          //방금 생성한 캐릭터만 업데이트하는 Fetch 함수를 따로 만들 수 있음
-            LoadAllCharactersFromServer(Cast<APlayerController>(FinishedTask->RequestorPC));
-        }
         ActiveTasks.Remove(FinishedTask);
         UE_LOG(LogTemp, Log, TEXT("Task removed from GI array. GC will collect it soon."));
     }
@@ -378,7 +359,7 @@ void URPGGameInstance::RegisterPlayer(APlayerController* PC, const FString& InId
 
 ELogSeverity URPGGameInstance::GetSeverity(FNetworkReturnResult Result)
 {
-    ELogSeverity Severity;
+    ELogSeverity Severity = ELogSeverity::Log;
     switch (Result.Type)
     {
     default:break;

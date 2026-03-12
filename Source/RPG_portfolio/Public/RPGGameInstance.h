@@ -52,17 +52,19 @@ public:
 	bool CharSelected = false;
 	/** Create new character with job and name. This will automatically send created data to DB server and add it to character list */
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void CreateNewCharacter(APlayerController* RequestorPC, const EClassType& InJob, const FString& InName);
+	void CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void LoadAllCharactersFromServer(APlayerController* RequestorPC);
+	void LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData);
+	void SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	const TArray<FCharData>& GetCharacters() { return Characters; }
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	const FCharData& GetCurrentChar() { return CurrentChar; }
 
 private: 
+	UPROPERTY()
+	UPlayFabAuthenticationContext* MyAuthContext;
 	UPROPERTY()
 	TMap<APlayerController*, FCharData> CharDataDepot;
 	UPROPERTY()
@@ -85,10 +87,14 @@ private:
 	UFUNCTION()
 	void InitServerPlayFab();
 	UFUNCTION(BlueprintCallable, Category = "RPG/Data")
-	void SetEntityInfo(const FString& InId, const FString& InType);
+	void SetEntityInfo(const FString& InId, const FString& InType, UPlayFabAuthenticationContext* InAuthContext);
 
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	void SetCurrentChar(const FCharData& InChar) { CurrentChar = InChar; }
+	UFUNCTION(BlueprintCallable, Category = "PlayFab")
+	const FString& GetEntityId() { return MyEntityId; }
+	UFUNCTION(BlueprintCallable, Category = "PlayFab")
+	const FString& GetEntityType() { return MyEntityType; }
 	UFUNCTION()
 	void UpdateCharNameToDepot(APlayerController* PC, const FString& InName);
 	UFUNCTION()

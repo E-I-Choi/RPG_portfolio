@@ -24,17 +24,15 @@ public:
 	FOnCharListUpdated OnCharListUpdated;
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqCreateNewChar(const EClassType& InJob, const FString& InName);
+	void Server_ReqCreateNewChar(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqLoadAllCharacters();
+	void Server_ReqLoadAllCharacters(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqDeleteCharacter(); // 사용하지 않음
 
 	UFUNCTION(Client, Reliable)
-	void ReceiveNetResponse(const FNetworkReturnResult& Result);
+	void Client_ReceiveNetResponse(const FNetworkReturnResult& Result);
 	UFUNCTION(Client, Reliable)
-	void ReceiveCharacterList(const TArray<FCharData>& InCharacters);
-	UFUNCTION(Client, Reliable)
-	void PostLoginLoadCharacters();
+	void Client_ReceiveCharacterList(const TArray<FCharData>& InCharacters);
 
 };

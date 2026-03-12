@@ -20,7 +20,13 @@ class RPG_PORTFOLIO_API APC_RPG : public ARPG_portfolioPlayerController
 
 public:
 	UFUNCTION(Client, Reliable)
-	void ReceiveNetResponse(const FNetworkReturnResult& Result);
+	void Client_ReceiveReqSaveCharacter();
+	UFUNCTION(Client, Reliable)
+	void Client_ReceiveReqSaveCharacterWithData(const FCharData& InCharData);
+	UFUNCTION(Client, Reliable)
+	void Client_ReceiveReqRegisterPlayer();
+	UFUNCTION(Client, Reliable)
+	void Client_ReceiveNetResponse(const FNetworkReturnResult& Result);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdatName(const FString& NewName);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
@@ -41,6 +47,10 @@ public:
 	void Server_ReqUpdateMP(const float MPIncrease);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdateLocation(const int32 X, const int32 Y, const int32 Z);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_ReqSaveCharacter(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
+	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
+	void Server_RegisterPlayer(const FString& InstanceId);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	FCharData GetCharData();
 	

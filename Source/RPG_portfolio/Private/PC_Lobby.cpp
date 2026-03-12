@@ -7,26 +7,26 @@
 
 
 
-bool APC_Lobby::Server_ReqCreateNewChar_Validate(const EClassType& InJob, const FString& InName)
+bool APC_Lobby::Server_ReqCreateNewChar_Validate(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName)
 {
 	return true;
 }
 
-void APC_Lobby::Server_ReqCreateNewChar_Implementation(const EClassType& InJob, const FString& InName)
+void APC_Lobby::Server_ReqCreateNewChar_Implementation(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->CreateNewCharacter(this, InJob, InName);
+	GI->CreateNewCharacter(this, InEntityId, InEntityType, InAuthContext, InJob, InName);
 }
 
-bool APC_Lobby::Server_ReqLoadAllCharacters_Validate()
+bool APC_Lobby::Server_ReqLoadAllCharacters_Validate(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
 	return true;
 }
 
-void APC_Lobby::Server_ReqLoadAllCharacters_Implementation()
+void APC_Lobby::Server_ReqLoadAllCharacters_Implementation(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->LoadAllCharactersFromServer(this);
+	GI->LoadAllCharactersFromServer(this, InEntityId, InEntityType, InAuthContext);
 }
 
 bool APC_Lobby::Server_ReqDeleteCharacter_Validate()
@@ -42,7 +42,7 @@ void APC_Lobby::Server_ReqDeleteCharacter_Implementation()
 
 
 
-void APC_Lobby::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
+void APC_Lobby::Client_ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
 {
 
 	switch (Result.Type)
@@ -51,7 +51,8 @@ void APC_Lobby::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Re
 	case ENetConnectionType::NewCharacter:
 		if (Result.Response == ENetResponseType::Success)
 		{
-			Server_ReqLoadAllCharacters();
+			URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
+			Server_ReqLoadAllCharacters(GI->GetEntityId(), GI->GetEntityType(), GI->MyAuthContext);
 		}
 		break;
 	}
@@ -60,17 +61,10 @@ void APC_Lobby::ReceiveNetResponse_Implementation(const FNetworkReturnResult& Re
 	GI->OnSystemMessageLog.Broadcast(Result.Context, GI->GetSeverity(Result));
 }
 
-void APC_Lobby::PostLoginLoadCharacters_Implementation()
-{
-	Server_ReqLoadAllCharacters();
-}
 
-
-void APC_Lobby::ReceiveCharacterList_Implementation(const TArray<FCharData>& InCharacters)
+void APC_Lobby::Client_ReceiveCharacterList_Implementation(const TArray<FCharData>& InCharacters)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
 	GI->Characters = InCharacters;
 	OnCharListUpdated.Broadcast();
 }
-
-
