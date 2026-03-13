@@ -3,12 +3,11 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "GameTypes.h"
-
 #include "PlayFab.h"
-#include "Core/PlayFabSettings.h"
-#include "Core/PlayFabEconomyAPI.h"
-#include "Core/PlayFabEconomyDataModels.h"
-#include "Core/PlayFabError.h"
+
+
+#include "PlayFabEconomyDataModels.h"
+#include "PlayFabSettings.h"
 
 #include "NetworkTask.generated.h"
 
@@ -21,8 +20,6 @@ enum class ETaskState : uint8
 };
 
 DECLARE_DELEGATE_OneParam(FOnPostTaskDestroy, UNetworkTask*);
-
-
 
 UCLASS()
 class RPG_PORTFOLIO_API UNetworkTask : public UObject
@@ -55,5 +52,17 @@ private :
 	int32 TicketId = 0;
 	FTimerHandle TimeoutHandle;
 	void FinishTask(bool bSuccess);
+	UFUNCTION()
+	void OnSucessLoadCharacters(FEconomyGetInventoryItemsResponse Result, UObject* CustomData);
+	UFUNCTION()
+	void OnSucessGrantCharacter();
+	UFUNCTION()
+	void OnSucessUpdateCharacter();
+	UFUNCTION()
+	void OnLoadFailure(FPlayFabError Error, UObject* CustomData);
+	UFUNCTION()
+	void OnGrantFailure(FPlayFabError Error, UObject* CustomData);
+	UFUNCTION()
+	void OnUpdateFailure(FPlayFabError Error, UObject* CustomData);
 
 };

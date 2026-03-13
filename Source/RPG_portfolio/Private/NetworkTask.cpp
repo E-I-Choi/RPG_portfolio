@@ -3,6 +3,8 @@
 #include "Dom/JsonObject.h"
 #include "Dom/JsonValue.h"
 
+#include "PlayFabEconomyAPI.h"
+
 #include "BPFL_Character.h"
 #include "PC_Lobby.h"
 #include "PC_RPG.h"
@@ -34,6 +36,97 @@ void UNetworkTask::FinishTask(bool bSuccess)
 	
 }
 
+void UNetworkTask::OnSucessLoadCharacters(FEconomyGetInventoryItemsResponse Result, UObject* CustomData)
+{
+	if (!(CurrentState == ETaskState::InFlight))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
+		return;
+	}
+
+	TArray<FCharData> ExtractedCharacters;
+
+	for (const auto& InvItem : Result.Items)
+	{
+		FCharData CharData;
+		FString ItemId = InvItem->GetStringField(TEXT("ItemId"));
+		CharData.SetItemInstanceId(ItemId);
+		UPlayFabJsonObject* DisplayProps = InvItem->GetObjectField(TEXT("DisplayProperties"));
+
+		const TSharedPtr<FJsonObject>* OutObject;
+
+		if (DisplayProps != nullptr)
+		{
+			FJsonObjectConverter::JsonObjectToUStruct(
+				DisplayProps->GetRootObject().ToSharedRef(),
+				FCharData::StaticStruct(),
+				&CharData
+			);
+		}
+
+		ExtractedCharacters.Add(CharData);
+	}
+
+	FNetworkReturnResult MyReturn;
+	MyReturn.Response = ENetResponseType::Success;
+	MyReturn.Type = ENetConnectionType::LoadCharacters;
+	MyReturn.Context = FString::Printf(TEXT("Success: %d Characters loaded"), ExtractedCharacters.Num());
+
+	if (this->RequestorPC.IsValid())
+	{
+		APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
+
+		if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
+		{
+			LobbyPC->Client_ReceiveCharacterList(ExtractedCharacters);
+			LobbyPC->Client_ReceiveNetResponse(MyReturn);
+		}
+	}
+
+
+	this->FinishTask(true);
+}
+
+void UNetworkTask::OnSucessGrantCharacter()
+{
+}
+
+void UNetworkTask::OnSucessUpdateCharacter()
+{
+}
+
+void UNetworkTask::OnLoadFailure(FPlayFabError Error, UObject* CustomData)
+{
+	if (!(CurrentState == ETaskState::InFlight))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
+		return;
+	}
+	FNetworkReturnResult MyReturn;
+	MyReturn.Response = ENetResponseType::Failed;
+	MyReturn.Type = ENetConnectionType::LoadCharacters;
+	MyReturn.Context = Error.ErrorMessage;
+
+	if (this->RequestorPC.IsValid())
+	{
+		APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
+		if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
+		{
+			LobbyPC->Client_ReceiveNetResponse(MyReturn);
+		}
+	}
+
+	this->FinishTask(false);
+}
+
+void UNetworkTask::OnGrantFailure(FPlayFabError Error, UObject* CustomData)
+{
+}
+
+void UNetworkTask::OnUpdateFailure(FPlayFabError Error, UObject* CustomData)
+{
+}
+
 void UNetworkTask::ExecuteTimer()
 {
 	CurrentState = ETaskState::InFlight;
@@ -55,99 +148,35 @@ void UNetworkTask::ExecuteTimer()
 
 void UNetworkTask::ExecuteLoadCharacters(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
-
-	PlayFabEconomyPtr EconomyAPI = IPlayFabModuleInterface::Get().GetEconomyAPI();
-	if (!EconomyAPI.IsValid()) return;
+	
+	FEconomyGetInventoryItemsRequest Request;
 
 	ExecuteTimer();
-
-	PlayFab::EconomyModels::FGetInventoryItemsRequest Request;
-
-	Request.Entity = MakeShared<PlayFab::EconomyModels::FEntityKey>();
-	Request.Entity->Id = InEntityId;
-	Request.Entity->Type = InEntityType;
-	Request.AuthenticationContext = MakeShareable(InAuthContext);
+	
+	UPlayFabJsonObject* EntityObj = NewObject<UPlayFabJsonObject>();
+	EntityObj->SetStringField(TEXT("Id"), InEntityId);
+	EntityObj->SetStringField(TEXT("Type"), TEXT("title_player_account"));
 
 	Request.Filter = TEXT("ContentType eq 'Character'");
 
-	EconomyAPI->GetInventoryItems(
+	UPlayFabEconomyAPI::FDelegateOnSuccessGetInventoryItems SuccessDelegate;
+	SuccessDelegate.BindUFunction(this, FName("OnSucessLoadCharacters"));
+
+	UPlayFabEconomyAPI::FDelegateOnFailurePlayFabError FailureDelegate;
+	FailureDelegate.BindUFunction(this, FName("OnLoadFailure"));
+
+	UPlayFabEconomyAPI* Proxy = UPlayFabEconomyAPI::GetInventoryItems(
 		Request,
-		PlayFab::UPlayFabEconomyAPI::FGetInventoryItemsDelegate::CreateLambda([this](const PlayFab::EconomyModels::FGetInventoryItemsResponse Result)
-			{
-				if (!(CurrentState == ETaskState::InFlight))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
-					return;
-				}
-
-				TArray<FCharData> ExtractedCharacters;
-
-				for (const auto& InvItem : Result.Items)
-				{
-					FCharData CharData;
-					CharData.SetItemInstanceId(InvItem.Id);
-					const TSharedPtr<FJsonObject>* OutObject;
-					if (InvItem.DisplayProperties.GetJsonValue()->TryGetObject(OutObject))
-					{
-						TSharedPtr<FJsonObject> RootObj = InvItem.DisplayProperties.GetJsonValue()->AsObject();
-						if (RootObj.IsValid())
-						{
-							FJsonObjectConverter::JsonObjectToUStruct(RootObj.ToSharedRef(), FCharData::StaticStruct(), &CharData);
-						}
-					}
-					ExtractedCharacters.Add(CharData);
-				}
-				
-				FNetworkReturnResult MyReturn;
-				MyReturn.Response = ENetResponseType::Success;
-				MyReturn.Type = ENetConnectionType::LoadCharacters;
-				MyReturn.Context = FString::Printf(TEXT("Success: %d Characters loaded"), ExtractedCharacters.Num());
-
-				if (this->RequestorPC.IsValid())
-				{
-					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
-					
-					if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
-					{
-						LobbyPC->Client_ReceiveCharacterList(ExtractedCharacters);
-						LobbyPC->Client_ReceiveNetResponse(MyReturn);
-					}
-				}
-
-
-				this->FinishTask(true);
-			}),
-		PlayFab::FPlayFabErrorDelegate::CreateLambda([this](const PlayFab::FPlayFabCppError& Error)
-			{
-				if (!(CurrentState == ETaskState::InFlight))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
-					return;
-				}
-				FNetworkReturnResult MyReturn;
-				MyReturn.Response = ENetResponseType::Failed;
-				MyReturn.Type = ENetConnectionType::LoadCharacters;
-				MyReturn.Context = Error.ErrorMessage;
-
-				if (this->RequestorPC.IsValid())
-				{
-					APC_Lobby* LobbyPC = Cast<APC_Lobby>(RequestorPC);
-					if (LobbyPC && LobbyPC->GetNetConnection() != nullptr)
-					{
-						LobbyPC->Client_ReceiveNetResponse(MyReturn);
-					}
-				}
-
-				this->FinishTask(false);
-			})
+		SuccessDelegate,
+		FailureDelegate,
+		nullptr
 	);
 }
 
 void UNetworkTask::ExecuteUpdateCharData(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FCharData DataToSave)
 {
-	PlayFabEconomyPtr EconomyAPI = IPlayFabModuleInterface::Get().GetEconomyAPI();
-	if (!EconomyAPI.IsValid()) return;
-
+	
+	FEconomyUpdateInventoryItemsRequest Request;
 	ExecuteTimer();
 
 	PlayFab::EconomyModels::FUpdateInventoryItemsRequest Request;
