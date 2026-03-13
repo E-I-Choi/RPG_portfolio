@@ -35,11 +35,11 @@ public:
 	UFUNCTION()
 	void ExecuteTimer();
 	UFUNCTION()
-	void ExecuteLoadCharacters(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext);
+	void ExecuteLoadCharacters(FString InEntityId);
 	UFUNCTION()
-	void ExecuteUpdateCharData(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FCharData DataToSave);
+	void ExecuteUpdateCharData(FString InEntityId, FCharData DataToSave);
 	UFUNCTION()
-	void ExecuteGrantNewCharItem(FString InEntityId, FString InEntityType, UPlayFabAuthenticationContext* InAuthContext, FString InName, EClassType InJob);
+	void ExecuteGrantNewCharItem(FString InEntityId, FString InName, EClassType InJob);
 	ENetConnectionType ConnectionType = ENetConnectionType::none;
 	TWeakObjectPtr<class APlayerController> RequestorPC;
 	
@@ -55,9 +55,9 @@ private :
 	UFUNCTION()
 	void OnSucessLoadCharacters(FEconomyGetInventoryItemsResponse Result, UObject* CustomData);
 	UFUNCTION()
-	void OnSucessGrantCharacter();
+	void OnSucessGrantCharacter(FEconomyAddInventoryItemsResponse Result, UObject* CustomData);
 	UFUNCTION()
-	void OnSucessUpdateCharacter();
+	void OnSucessUpdateCharacter(FEconomyUpdateInventoryItemsResponse Result, UObject* CustomData);
 	UFUNCTION()
 	void OnLoadFailure(FPlayFabError Error, UObject* CustomData);
 	UFUNCTION()

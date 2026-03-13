@@ -24,9 +24,9 @@ public:
 	FOnCharListUpdated OnCharListUpdated;
 
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqCreateNewChar(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName);
+	void Server_ReqCreateNewChar(const FString& InEntityId, const EClassType& InJob, const FString& InName);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqLoadAllCharacters(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
+	void Server_ReqLoadAllCharacters(const FString& InEntityId);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqDeleteCharacter(); // 사용하지 않음
 

@@ -123,7 +123,7 @@ void APC_RPG::Server_ReqUpdateLocation_Implementation(const int32 X, const int32
 void APC_RPG::Server_ReqSaveCharacter_Implementation(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->SaveCharacterToServer(this, InCharData, InEntityId, InEntityType, InAuthContext);
+	GI->SaveCharacterToServer(this, InCharData, InEntityId);
 
 }
 

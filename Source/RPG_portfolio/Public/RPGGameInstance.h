@@ -52,11 +52,11 @@ public:
 	bool CharSelected = false;
 	/** Create new character with job and name. This will automatically send created data to DB server and add it to character list */
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName);
+	void CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const EClassType& InJob, const FString& InName);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
+	void LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
+	void SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	const TArray<FCharData>& GetCharacters() { return Characters; }
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")

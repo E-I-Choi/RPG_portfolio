@@ -7,26 +7,26 @@
 
 
 
-bool APC_Lobby::Server_ReqCreateNewChar_Validate(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName)
+bool APC_Lobby::Server_ReqCreateNewChar_Validate(const FString& InEntityId, const EClassType& InJob, const FString& InName)
 {
 	return true;
 }
 
-void APC_Lobby::Server_ReqCreateNewChar_Implementation(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName)
+void APC_Lobby::Server_ReqCreateNewChar_Implementation(const FString& InEntityId, const EClassType& InJob, const FString& InName)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->CreateNewCharacter(this, InEntityId, InEntityType, InAuthContext, InJob, InName);
+	GI->CreateNewCharacter(this, InEntityId, InJob, InName);
 }
 
-bool APC_Lobby::Server_ReqLoadAllCharacters_Validate(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+bool APC_Lobby::Server_ReqLoadAllCharacters_Validate(const FString& InEntityId)
 {
 	return true;
 }
 
-void APC_Lobby::Server_ReqLoadAllCharacters_Implementation(const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+void APC_Lobby::Server_ReqLoadAllCharacters_Implementation(const FString& InEntityId)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->LoadAllCharactersFromServer(this, InEntityId, InEntityType, InAuthContext);
+	GI->LoadAllCharactersFromServer(this, InEntityId);
 }
 
 bool APC_Lobby::Server_ReqDeleteCharacter_Validate()
@@ -52,7 +52,7 @@ void APC_Lobby::Client_ReceiveNetResponse_Implementation(const FNetworkReturnRes
 		if (Result.Response == ENetResponseType::Success)
 		{
 			URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-			Server_ReqLoadAllCharacters(GI->GetEntityId(), GI->GetEntityType(), GI->MyAuthContext);
+			Server_ReqLoadAllCharacters(GI->GetEntityId());
 		}
 		break;
 	}

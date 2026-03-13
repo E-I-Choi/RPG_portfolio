@@ -28,17 +28,4 @@ public:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName);
-	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
-	void LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
-	UFUNCTION()
-	UNetworkTask* AddNetworkTask();
-	UFUNCTION()
-	void RemoveNetworkTask(UNetworkTask* FinishedTask);
-	UPROPERTY()
-	int32 RequestSequenceIndex;
-	UPROPERTY()
-	TArray<UNetworkTask*> ActiveTasks;
-
 };

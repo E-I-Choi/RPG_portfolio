@@ -56,21 +56,21 @@ void URPGGameInstance::BroadcastSystemMessage(APlayerController* RequestorPC, co
     }
 }
 
-void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext, const EClassType& InJob, const FString& InName)
+void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const FString& InEntityId, const EClassType& InJob, const FString& InName)
 {
     if (!RequestorPC) return;
-    if ((GetWorld()->IsNetMode(NM_DedicatedServer))) return;
+    if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
 
     UNetworkTask* LoadTask = AddNetworkTask();
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::NewCharacter, TEXT("NewCharacter"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
     
-    LoadTask->ExecuteGrantNewCharItem(InEntityId, InEntityType, InAuthContext ,InName, InJob);
+    LoadTask->ExecuteGrantNewCharItem(InEntityId, InName, InJob);
 
 	return;
 }
 
-void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorPC, const FString& InEntityId)
 {
     if (!RequestorPC)
     {
@@ -79,7 +79,7 @@ void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorP
     }
     if (!(GetWorld()->IsNetMode(NM_DedicatedServer)))
     {
-        UE_LOG(LogTemp, Warning, TEXT("InvalidOwner"));
+        UE_LOG(LogTemp, Warning, TEXT("InvalidNetMode"));
         return;
     }
 
@@ -90,11 +90,11 @@ void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorP
     RequestSequenceIndex++;
    
 
-    LoadTask->ExecuteLoadCharacters(InEntityId, InEntityType, InAuthContext);
+    LoadTask->ExecuteLoadCharacters(InEntityId);
 }
 
 
-void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId)
 {
 
     if (!RequestorPC) return;
@@ -106,7 +106,7 @@ void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCh
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::SaveCharacters, TEXT("CharacterLoad"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
 
-    LoadTask->ExecuteUpdateCharData(InEntityId, InEntityType, InAuthContext, InCharData);
+    LoadTask->ExecuteUpdateCharData(InEntityId, InCharData);
   
 }
 
@@ -141,7 +141,24 @@ void URPGGameInstance::InitServerPlayFab()
 {
     if (GetWorld()->IsNetMode(NM_DedicatedServer))
     {
-        GetMutableDefault<UPlayFabRuntimeSettings>()->DeveloperSecretKey = TEXT("CMOPICH4F873IPQCOKS8ZF9T7TR84HFGEJYCY6IXH5T3GFTYMI");
+        FString TargetTitleId;
+        FString TargetSecretKey;
+
+        GConfig->GetString(TEXT("/Script/PlayFabSettings"), TEXT("TitleId"), TargetTitleId, GGameIni);
+        GConfig->GetString(TEXT("/Script/PlayFabSettings"), TEXT("DeveloperSecretKey"), TargetSecretKey, GGameIni);
+
+        if (!TargetTitleId.IsEmpty() && !TargetSecretKey.IsEmpty())
+        {
+            UPlayFabRuntimeSettings* Settings = GetMutableDefault<UPlayFabRuntimeSettings>();
+
+            if (Settings)
+            {
+                Settings->TitleId = TargetTitleId;
+                Settings->DeveloperSecretKey = TargetSecretKey;
+
+                UE_LOG(LogTemp, Log, TEXT("PlayFab Server Settings Initialized."));
+            }
+        }
     }
 }
 
