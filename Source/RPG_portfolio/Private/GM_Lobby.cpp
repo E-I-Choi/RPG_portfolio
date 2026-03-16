@@ -9,8 +9,6 @@ AGM_Lobby::AGM_Lobby()
 void AGM_Lobby::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
-
 }
 
 void AGM_Lobby::BeginPlay()

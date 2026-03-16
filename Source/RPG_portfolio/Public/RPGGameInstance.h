@@ -64,13 +64,9 @@ public:
 
 private: 
 	UPROPERTY()
-	UPlayFabAuthenticationContext* MyAuthContext;
-	UPROPERTY()
 	TMap<APlayerController*, FCharData> CharDataDepot;
 	UPROPERTY()
-	FString MyEntityId;
-	UPROPERTY()
-	FString MyEntityType;
+	FString CustomId;
 	UPROPERTY()
 	int32 RequestSequenceIndex;
 	UPROPERTY()
@@ -87,14 +83,12 @@ private:
 	UFUNCTION()
 	void InitServerPlayFab();
 	UFUNCTION(BlueprintCallable, Category = "RPG/Data")
-	void SetEntityInfo(const FString& InId, const FString& InType, UPlayFabAuthenticationContext* InAuthContext);
+	void SetPlayFabInfo(const FString& InId);
 
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")
 	void SetCurrentChar(const FCharData& InChar) { CurrentChar = InChar; }
 	UFUNCTION(BlueprintCallable, Category = "PlayFab")
-	const FString& GetEntityId() { return MyEntityId; }
-	UFUNCTION(BlueprintCallable, Category = "PlayFab")
-	const FString& GetEntityType() { return MyEntityType; }
+	const FString& GetCustomId() { return CustomId; }
 	UFUNCTION()
 	void UpdateCharNameToDepot(APlayerController* PC, const FString& InName);
 	UFUNCTION()

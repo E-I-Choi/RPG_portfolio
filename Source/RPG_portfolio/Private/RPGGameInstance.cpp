@@ -28,6 +28,7 @@ void URPGGameInstance::Init()
     Super::Init();
 
     InitServerPlayFab();
+
 }
 
 void URPGGameInstance::BroadcastSystemMessage(APlayerController* RequestorPC, const FString& Message, ELogSeverity Severity)
@@ -94,7 +95,7 @@ void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorP
 }
 
 
-void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InEntityId)
+void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCharData InCharData, const FString& InCustomId)
 {
 
     if (!RequestorPC) return;
@@ -106,17 +107,15 @@ void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCh
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::SaveCharacters, TEXT("CharacterLoad"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
 
-    LoadTask->ExecuteUpdateCharData(InEntityId, InCharData);
+    LoadTask->ExecuteUpdateCharData(InCustomId, InCharData);
   
 }
 
-void URPGGameInstance::SetEntityInfo(const FString& InId, const FString& InType, UPlayFabAuthenticationContext* InAuthContext)
+void URPGGameInstance::SetPlayFabInfo(const FString& InId)
 {
     if (GetWorld()->IsNetMode(NM_DedicatedServer)) return;
-    MyEntityId = InId;
-    MyEntityType = InType;
-    MyAuthContext = InAuthContext;
-    UE_LOG(LogTemp, Log, TEXT("Entity ID Saved: %s"), *MyEntityId);
+    CustomId = InId;
+    UE_LOG(LogTemp, Log, TEXT("PlayFabCustom ID Saved: %s"), *CustomId);
 }
 
 UNetworkTask* URPGGameInstance::AddNetworkTask()

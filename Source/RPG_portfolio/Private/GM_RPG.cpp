@@ -19,11 +19,6 @@ void AGM_RPG::BeginPlay()
 void AGM_RPG::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	APC_RPG* ThePC = Cast<APC_RPG>(NewPlayer);
-	if (ThePC)
-	{
-		ThePC->Client_ReceiveReqRegisterPlayer();
-	}
 }
 
 void AGM_RPG::Logout(AController* Exiting)

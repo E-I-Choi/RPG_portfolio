@@ -37,7 +37,7 @@ public:
 	UFUNCTION()
 	void ExecuteLoadCharacters(FString InEntityId);
 	UFUNCTION()
-	void ExecuteUpdateCharData(FString InEntityId, FCharData DataToSave);
+	void ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave);
 	UFUNCTION()
 	void ExecuteGrantNewCharItem(FString InEntityId, FString InName, EClassType InJob);
 	ENetConnectionType ConnectionType = ENetConnectionType::none;
@@ -52,12 +52,13 @@ private :
 	int32 TicketId = 0;
 	FTimerHandle TimeoutHandle;
 	void FinishTask(bool bSuccess);
+	
 	UFUNCTION()
-	void OnSucessLoadCharacters(FEconomyGetInventoryItemsResponse Result, UObject* CustomData);
+	void OnSucessLoadCharacters(FServerGetUserInventoryResult Result, UObject* CustomData);
 	UFUNCTION()
-	void OnSucessGrantCharacter(FEconomyAddInventoryItemsResponse Result, UObject* CustomData);
+	void OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, UObject* CustomData);
 	UFUNCTION()
-	void OnSucessUpdateCharacter(FEconomyUpdateInventoryItemsResponse Result, UObject* CustomData);
+	void OnSucessUpdateCharacter(FServerUpdateUserDataResult Result, UObject* CustomData);
 	UFUNCTION()
 	void OnLoadFailure(FPlayFabError Error, UObject* CustomData);
 	UFUNCTION()
