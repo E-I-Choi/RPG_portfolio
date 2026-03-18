@@ -70,16 +70,16 @@ private:
 	UPROPERTY()
 	int32 RequestSequenceIndex;
 	UPROPERTY()
-	TArray<UNetworkTask*> ActiveTasks;
+	TArray<ANetworkTask*> ActiveTasks;
 	UPROPERTY()
 	TArray<FCharData> Characters;
 	/** The character data currently selected and controlled by the player. @warning This contains INVALID default values before selection. */
 	UPROPERTY()
 	FCharData CurrentChar;
 	UFUNCTION()
-	UNetworkTask* AddNetworkTask();
+	ANetworkTask* AddNetworkTask();
 	UFUNCTION()
-	void RemoveNetworkTask(UNetworkTask* FinishedTask);
+	void RemoveNetworkTask(ANetworkTask* FinishedTask);
 	UFUNCTION()
 	void InitServerPlayFab();
 	UFUNCTION(BlueprintCallable, Category = "RPG/Data")

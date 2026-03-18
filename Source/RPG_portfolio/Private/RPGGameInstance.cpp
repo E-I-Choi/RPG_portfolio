@@ -61,7 +61,7 @@ void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const 
     if (!RequestorPC) return;
     if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
 
-    UNetworkTask* LoadTask = AddNetworkTask();
+    ANetworkTask* LoadTask = AddNetworkTask();
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::NewCharacter, TEXT("NewCharacter"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
     
@@ -83,7 +83,7 @@ void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorP
         return;
     }
 
-    UNetworkTask* LoadTask = AddNetworkTask();
+    ANetworkTask* LoadTask = AddNetworkTask();
     
 
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::LoadCharacters, TEXT("CharacterLoad"), 20.0f, RequestSequenceIndex);
@@ -100,7 +100,7 @@ void URPGGameInstance::SaveCharacterToServer(APlayerController* RequestorPC, FCh
     if (!RequestorPC) return;
     if (!(GetWorld()->IsNetMode(NM_DedicatedServer))) return;
 
-    UNetworkTask* LoadTask = AddNetworkTask();
+    ANetworkTask* LoadTask = AddNetworkTask();
 
 
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::SaveCharacters, TEXT("CharacterLoad"), 10.0f, RequestSequenceIndex);
@@ -117,16 +117,16 @@ void URPGGameInstance::SetPlayFabInfo(const FString& InId)
     UE_LOG(LogTemp, Log, TEXT("PlayFabCustom ID Saved: %s"), *CustomId);
 }
 
-UNetworkTask* URPGGameInstance::AddNetworkTask()
+ANetworkTask* URPGGameInstance::AddNetworkTask()
 {
-    UNetworkTask* NewTask = NewObject<UNetworkTask>(this);
+    ANetworkTask* NewTask = NewObject<ANetworkTask>(this);
     ActiveTasks.Add(NewTask);
     NewTask->OnPostTaskDestroy.BindUObject(this, &URPGGameInstance::RemoveNetworkTask);
 
     return NewTask;
 }
 
-void URPGGameInstance::RemoveNetworkTask(UNetworkTask* FinishedTask)
+void URPGGameInstance::RemoveNetworkTask(ANetworkTask* FinishedTask)
 {
     if (FinishedTask)
     {

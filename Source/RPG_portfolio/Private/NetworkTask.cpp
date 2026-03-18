@@ -10,7 +10,7 @@
 #include "PC_Lobby.h"
 #include "PC_RPG.h"
 
-void UNetworkTask::InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requestor, ENetConnectionType Type, FString InContext, float InTimeLimit, int32 InTicketId)
+void ANetworkTask::InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requestor, ENetConnectionType Type, FString InContext, float InTimeLimit, int32 InTicketId)
 {
 	Context = InContext;
 	TimeLimit = InTimeLimit;
@@ -19,7 +19,7 @@ void UNetworkTask::InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requ
 	RequestorPC = Requestor;
 }
 
-void UNetworkTask::FinishTask(bool bSuccess)
+void ANetworkTask::FinishTask(bool bSuccess)
 {
 
 	if (UWorld* World = GetWorld())
@@ -37,7 +37,7 @@ void UNetworkTask::FinishTask(bool bSuccess)
 	
 }
 
-void UNetworkTask::OnSucessLoadCharacters(FServerGetUserInventoryResult Result, UObject* CustomData)
+void ANetworkTask::OnSucessLoadCharacters(FServerGetUserInventoryResult Result, UObject* CustomData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("=== PlayFab API Response Received! ==="));
 	if (!(CurrentState == ETaskState::InFlight))
@@ -120,7 +120,7 @@ void UNetworkTask::OnSucessLoadCharacters(FServerGetUserInventoryResult Result, 
 	this->FinishTask(true);
 }
 
-void UNetworkTask::OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, UObject* CustomData)
+void ANetworkTask::OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight)) return;
 	FNetworkReturnResult MyReturn;
@@ -138,7 +138,7 @@ void UNetworkTask::OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, 
 	this->FinishTask(true);
 }
 
-void UNetworkTask::OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject* CustomData)
+void ANetworkTask::OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight))
 	{
@@ -163,7 +163,7 @@ void UNetworkTask::OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject*
 	this->FinishTask(true);
 }
 
-void UNetworkTask::OnLoadFailure(FPlayFabError Error, UObject* CustomData)
+void ANetworkTask::OnLoadFailure(FPlayFabError Error, UObject* CustomData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("=== PlayFab API Fail Response Received! ==="));
 	if (!(CurrentState == ETaskState::InFlight))
@@ -188,7 +188,7 @@ void UNetworkTask::OnLoadFailure(FPlayFabError Error, UObject* CustomData)
 	this->FinishTask(false);
 }
 
-void UNetworkTask::OnGrantFailure(FPlayFabError Error, UObject* CustomData)
+void ANetworkTask::OnGrantFailure(FPlayFabError Error, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight)) return;
 	FNetworkReturnResult MyReturn;
@@ -207,7 +207,7 @@ void UNetworkTask::OnGrantFailure(FPlayFabError Error, UObject* CustomData)
 	this->FinishTask(false);
 }
 
-void UNetworkTask::OnUpdateFailure(FPlayFabError Error, UObject* CustomData)
+void ANetworkTask::OnUpdateFailure(FPlayFabError Error, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight))
 			{
@@ -230,18 +230,23 @@ void UNetworkTask::OnUpdateFailure(FPlayFabError Error, UObject* CustomData)
 			this->FinishTask(false);
 }
 
-void UNetworkTask::ExecuteTimer()
+void ANetworkTask::ExecuteTimer()
 {
 	CurrentState = ETaskState::InFlight;
 	UWorld* World = GetWorld();
-	if (!World) return;
+	if (!World) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("There is no world)"));
+		return;
+	}
 	
 	World->GetTimerManager().SetTimer(TimeoutHandle, [this]()
 		{
 			if (!IsValid(this)) { return; }
 			CurrentState = ETaskState::TimedOut;
-			FinishTask(false);
 			UE_LOG(LogTemp, Warning, TEXT("Network doesn't answer: %s (Ticket: %d)"), *Context, TicketId);
+			FinishTask(false);
+			
 			
 		}, TimeLimit, false);
 
@@ -249,7 +254,7 @@ void UNetworkTask::ExecuteTimer()
 
 }
 
-void UNetworkTask::ExecuteLoadCharacters(FString InCustomId)
+void ANetworkTask::ExecuteLoadCharacters(FString InCustomId)
 {
 	ExecuteTimer();
 
@@ -264,12 +269,20 @@ void UNetworkTask::ExecuteLoadCharacters(FString InCustomId)
 
 	FString CurrentTitleId = GetDefault<UPlayFabRuntimeSettings>()->TitleId;
 
-	UPlayFabServerAPI::GetUserInventory(Request, SuccessDelegate, FailureDelegate, nullptr);
+	auto Settings = GetDefault<UPlayFabRuntimeSettings>();
 
+	if (FHttpModule::Get().IsHttpEnabled())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Http is disabled"));
+	}
+
+	UPlayFabServerAPI* Task = UPlayFabServerAPI::GetUserInventory(
+		Request, SuccessDelegate, FailureDelegate, nullptr);
+	Task->Activate();
 	
 }
 
-void UNetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave)
+void ANetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave)
 {
 	
 	FServerUpdateUserInventoryItemDataRequest Request;
@@ -355,7 +368,7 @@ void UNetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSav
 	);
 }
 
-void UNetworkTask::ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob)
+void ANetworkTask::ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob)
 {
 
 	FEconomyAddInventoryItemsRequest Request;

@@ -19,10 +19,10 @@ enum class ETaskState : uint8
 	Finished
 };
 
-DECLARE_DELEGATE_OneParam(FOnPostTaskDestroy, UNetworkTask*);
+DECLARE_DELEGATE_OneParam(FOnPostTaskDestroy, ANetworkTask*);
 
 UCLASS()
-class RPG_PORTFOLIO_API UNetworkTask : public UObject
+class RPG_PORTFOLIO_API ANetworkTask : public AActor
 {
 	GENERATED_BODY()
 	
