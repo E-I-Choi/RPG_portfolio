@@ -52,7 +52,7 @@ void APC_Lobby::Client_ReceiveNetResponse_Implementation(const FNetworkReturnRes
 		if (Result.Response == ENetResponseType::Success)
 		{
 			URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-			Server_ReqLoadAllCharacters(GI->GetEntityId());
+			Server_ReqLoadAllCharacters(GI->GetCustomId());
 		}
 		break;
 	}

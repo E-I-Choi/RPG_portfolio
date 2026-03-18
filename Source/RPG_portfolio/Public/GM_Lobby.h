@@ -27,5 +27,6 @@ public:
 	AGM_Lobby();
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 };

@@ -40,6 +40,7 @@ void AGM_RPG::Logout(AController* Exiting)
 
 void AGM_RPG::SaveAllDirtyPlayerData()
 {
+
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
 	if (!GI) return;
 
@@ -55,7 +56,7 @@ void AGM_RPG::SaveAllDirtyPlayerData()
 			if (ThePC)
 			{
 				ThePC->Client_ReceiveReqSaveCharacterWithData(Data);
-				GI->CharDataDepot.Remove(PC);
+				Data.ClearDirty();
 			}
 		}
 	}

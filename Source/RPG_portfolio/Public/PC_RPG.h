@@ -48,7 +48,7 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_ReqUpdateLocation(const int32 X, const int32 Y, const int32 Z);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
-	void Server_ReqSaveCharacter(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext);
+	void Server_ReqSaveCharacter(FCharData InCharData, const FString& InCustomId);
 	UFUNCTION(Server, Reliable, WithValidation, BlueprintCallable, Category = "RPG/Character")
 	void Server_RegisterPlayer(const FString& InstanceId);
 	UFUNCTION(BlueprintCallable, Category = "RPG/Character")

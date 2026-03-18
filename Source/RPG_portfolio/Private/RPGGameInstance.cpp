@@ -18,8 +18,7 @@ DEFINE_LOG_CATEGORY(LogRPG);
 
 URPGGameInstance::URPGGameInstance()
 {
-	MyEntityId = "";
-    MyEntityType = "";
+	CustomId = "";
     RequestSequenceIndex = 0;
 }
 
@@ -87,7 +86,7 @@ void URPGGameInstance::LoadAllCharactersFromServer(APlayerController* RequestorP
     UNetworkTask* LoadTask = AddNetworkTask();
     
 
-    LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::LoadCharacters, TEXT("CharacterLoad"), 10.0f, RequestSequenceIndex);
+    LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::LoadCharacters, TEXT("CharacterLoad"), 20.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
    
 
@@ -171,7 +170,8 @@ void URPGGameInstance::UpdateCharNameToDepot(APlayerController* PC, const FStrin
 
     if (TargetData == nullptr) return;
 
-    TargetData->Name = InName; // TargetData->SetDirty(EDF_Name);
+    TargetData->Name = InName;
+    TargetData->SetDirty(EDF_Name);
 
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     TheChar->ConditionComponent -> CharName = InName;
@@ -201,7 +201,7 @@ void URPGGameInstance::UpdateCharExpToDepot(APlayerController* PC, const float& 
         TargetData->Exp = TargetData->Exp + ExpIncrease;
     }
 
-    // TargetData->SetDirty(EDF_Exp);
+    TargetData->SetDirty(EDF_Exp);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     TheChar->Exp = TargetData->Exp;
 
@@ -217,7 +217,7 @@ void URPGGameInstance::UpdateCharLevelToDepot(APlayerController* PC, const int32
     if (TargetData == nullptr) return;
 
     TargetData->Level = TargetData->Level + LevelIncrease;
-    //TargetData->SetDirty(EDF_Level);
+    TargetData->SetDirty(EDF_Level);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     if(!(TheChar->ConditionComponent))
     {
@@ -236,7 +236,7 @@ void URPGGameInstance::UpdateCharEquipToDepot(APlayerController* PC, const FEqui
     if (TargetData == nullptr) return;
 
     TargetData->Equips = InEquips;
-    //TargetData->SetDirty(EDF_Equips);
+    TargetData->SetDirty(EDF_Equips);
     
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     //현재는 Equips를 묶어서 한 번에 처리하지만 확장성을 고려하여 로직을 각 파츠 단위로 쪼갤 수 있음
@@ -269,7 +269,7 @@ void URPGGameInstance::UpdateCharSkillToDepot(APlayerController* PC, const FStri
         TargetData->Skills.Add(InSkill);
     }
 
-    //TargetData->SetDirty(EDF_Skills);
+    TargetData->SetDirty(EDF_Skills);
 
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     TheChar->Skills = TargetData->Skills;
@@ -285,7 +285,7 @@ void URPGGameInstance::UpdateCharJobToDepot(APlayerController* PC, const EClassT
     if (TargetData == nullptr) return;
 
     TargetData->Job = NewClass;
-    //TargetData->SetDirty(EDF_Job);
+    TargetData->SetDirty(EDF_Job);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     TheChar->Job = TargetData->Job;
 }
@@ -306,7 +306,7 @@ void URPGGameInstance::UpdateCharStatusToDepot(APlayerController* PC, const FSta
     TargetData->Intelligence = TargetData->Intelligence + StatIncrease.Intelligence;
     TargetData->Strength = TargetData->Strength + StatIncrease.Strength;
 
-    //CharData->SetDirty(EDF_Status);
+    CharData->SetDirty(EDF_Status);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     TheChar->Status = CharData->Status;
 }
@@ -321,7 +321,7 @@ void URPGGameInstance::UpdateCharHPToDepot(APlayerController* PC, const float& H
     if (TargetData == nullptr) return;
 
     TargetData->HP = TargetData->HP + HPIncrease;
-   // TargetData->SetDirty(ECharacterDirtyFlags::EDF_HP);
+    TargetData->SetDirty(ECharacterDirtyFlags::EDF_HP);
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     if (!(TheChar->ConditionComponent))
     {
@@ -341,7 +341,7 @@ void URPGGameInstance::UpdateCharMPToDepot(APlayerController* PC, const float& M
     if (TargetData == nullptr) return;
 
     TargetData->HP = TargetData->MP + MPIncrease;
-    //TargetData->SetDirty(ECharacterDirtyFlags::EDF_MP);
+    TargetData->SetDirty(ECharacterDirtyFlags::EDF_MP);
    
     AMyCharacter* TheChar = Cast<AMyCharacter>(PC->GetPawn());
     if (!(TheChar->ConditionComponent))

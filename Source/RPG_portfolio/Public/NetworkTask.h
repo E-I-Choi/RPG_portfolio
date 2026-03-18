@@ -39,7 +39,7 @@ public:
 	UFUNCTION()
 	void ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave);
 	UFUNCTION()
-	void ExecuteGrantNewCharItem(FString InEntityId, FString InName, EClassType InJob);
+	void ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob);
 	ENetConnectionType ConnectionType = ENetConnectionType::none;
 	TWeakObjectPtr<class APlayerController> RequestorPC;
 	
@@ -58,7 +58,7 @@ private :
 	UFUNCTION()
 	void OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, UObject* CustomData);
 	UFUNCTION()
-	void OnSucessUpdateCharacter(FServerUpdateUserDataResult Result, UObject* CustomData);
+	void OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject* CustomData);
 	UFUNCTION()
 	void OnLoadFailure(FPlayFabError Error, UObject* CustomData);
 	UFUNCTION()

@@ -120,14 +120,14 @@ void APC_RPG::Server_ReqUpdateLocation_Implementation(const int32 X, const int32
 	GI->UpdateCharLocationToDepot(this, FMath::CeilToInt32(MyPawn->GetActorLocation().X), FMath::CeilToInt32(MyPawn->GetActorLocation().Y), FMath::CeilToInt32(MyPawn->GetActorLocation().Z));
 }
 
-void APC_RPG::Server_ReqSaveCharacter_Implementation(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+void APC_RPG::Server_ReqSaveCharacter_Implementation(FCharData InCharData, const FString& InCustomId)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	GI->SaveCharacterToServer(this, InCharData, InEntityId);
+	GI->SaveCharacterToServer(this, InCharData, InCustomId);
 
 }
 
-bool APC_RPG::Server_ReqSaveCharacter_Validate(FCharData InCharData, const FString& InEntityId, const FString& InEntityType, UPlayFabAuthenticationContext* InAuthContext)
+bool APC_RPG::Server_ReqSaveCharacter_Validate(FCharData InCharData, const FString& InCustomId)
 {
 	return true;
 }
@@ -174,13 +174,13 @@ FCharData APC_RPG::GetCharData()
 void APC_RPG::Client_ReceiveReqSaveCharacter_Implementation()
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	Server_ReqSaveCharacter(GetCharData(), GI->GetEntityId(), GI->GetEntityType(), GI->MyAuthContext);
+	Server_ReqSaveCharacter(GetCharData(), GI->GetCustomId());
 }
 
 void APC_RPG::Client_ReceiveReqSaveCharacterWithData_Implementation(const FCharData& InCharData)
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
-	Server_ReqSaveCharacter(InCharData, GI->GetEntityId(), GI->GetEntityType(), GI->MyAuthContext);
+	Server_ReqSaveCharacter(InCharData, GI->GetCustomId());
 }
 
 void APC_RPG::Client_ReceiveReqRegisterPlayer_Implementation()

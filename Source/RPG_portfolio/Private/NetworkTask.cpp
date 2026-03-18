@@ -39,6 +39,7 @@ void UNetworkTask::FinishTask(bool bSuccess)
 
 void UNetworkTask::OnSucessLoadCharacters(FServerGetUserInventoryResult Result, UObject* CustomData)
 {
+	UE_LOG(LogTemp, Warning, TEXT("=== PlayFab API Response Received! ==="));
 	if (!(CurrentState == ETaskState::InFlight))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
@@ -137,7 +138,7 @@ void UNetworkTask::OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, 
 	this->FinishTask(true);
 }
 
-void UNetworkTask::OnSucessUpdateCharacter(FEconomyUpdateInventoryItemsResponse Result, UObject* CustomData)
+void UNetworkTask::OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight))
 	{
@@ -164,6 +165,7 @@ void UNetworkTask::OnSucessUpdateCharacter(FEconomyUpdateInventoryItemsResponse 
 
 void UNetworkTask::OnLoadFailure(FPlayFabError Error, UObject* CustomData)
 {
+	UE_LOG(LogTemp, Warning, TEXT("=== PlayFab API Fail Response Received! ==="));
 	if (!(CurrentState == ETaskState::InFlight))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
@@ -250,6 +252,7 @@ void UNetworkTask::ExecuteTimer()
 void UNetworkTask::ExecuteLoadCharacters(FString InCustomId)
 {
 	ExecuteTimer();
+
 	FServerGetUserInventoryRequest Request;
 	Request.PlayFabId = InCustomId;
 
@@ -259,12 +262,11 @@ void UNetworkTask::ExecuteLoadCharacters(FString InCustomId)
 	UPlayFabServerAPI::FDelegateOnFailurePlayFabError FailureDelegate;
 	FailureDelegate.BindUFunction(this, FName("OnLoadFailure"));
 
-	UPlayFabServerAPI::GetUserInventory(
-		Request,
-		SuccessDelegate,
-		FailureDelegate,
-		nullptr
-	);
+	FString CurrentTitleId = GetDefault<UPlayFabRuntimeSettings>()->TitleId;
+
+	UPlayFabServerAPI::GetUserInventory(Request, SuccessDelegate, FailureDelegate, nullptr);
+
+	
 }
 
 void UNetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave)
@@ -274,30 +276,78 @@ void UNetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSav
 	ExecuteTimer();
 
 	Request.PlayFabId = InCustomId;
+	Request.ItemInstanceId = DataToSave.GetItemInstanceId();
 
 	UPlayFabJsonObject* ItemToUpdate = NewObject<UPlayFabJsonObject>();
 
-	TSharedPtr<FJsonObject> RootJsonObj = FJsonObjectConverter::UStructToJsonObject(DataToSave);
-
-	if (RootJsonObj.IsValid())
+	if (DataToSave.IsDirty(EDF_Name))
 	{
-		UPlayFabJsonObject* DisplayPropsObj = NewObject<UPlayFabJsonObject>();
-		DisplayPropsObj->SetRootObject(RootJsonObj);
-		ItemToUpdate->SetObjectField(TEXT("DisplayProperties"), DisplayPropsObj);
+		ItemToUpdate->SetStringField(TEXT("Name"), DataToSave.Name);
 	}
+	if (DataToSave.IsDirty(EDF_Level))
+	{
+		ItemToUpdate->SetNumberField(TEXT("Level"), DataToSave.Level);
+	}
+	if (DataToSave.IsDirty(EDF_Exp))
+	{
+		ItemToUpdate->SetNumberField(TEXT("Exp"), DataToSave.Exp);
+	}
+	if (DataToSave.IsDirty(EDF_HP))
+	{
+		ItemToUpdate->SetNumberField(TEXT("HP"), DataToSave.HP);
+	}
+	if (DataToSave.IsDirty(EDF_MP))
+	{
+		ItemToUpdate->SetNumberField(TEXT("MP"), DataToSave.MP);
+	}
+	if (DataToSave.IsDirty(EDF_Job))
+	{
+		UEnum* JobEnum = StaticEnum<EClassType>();
+		if (JobEnum)
+		{
+			FString JobString = JobEnum->GetNameStringByValue((int64)DataToSave.Job);
+			ItemToUpdate->SetStringField(TEXT("Job"), JobString);
+		}
+	}
+	if (DataToSave.IsDirty(EDF_Equips))
+	{
+		FString EquipsJson;
+		if (FJsonObjectConverter::UStructToJsonObjectString(DataToSave.Equips, EquipsJson))
+		{
+			UPlayFabJsonObject* EquipsJsonObj = NewObject<UPlayFabJsonObject>();
+			EquipsJsonObj->DecodeJson(EquipsJson);
+			ItemToUpdate->SetObjectField(TEXT("Equips"), EquipsJsonObj);
+		}
+	}
+	if (DataToSave.IsDirty(EDF_Status))
+	{
+		FString StatusJson;
+		if (FJsonObjectConverter::UStructToJsonObjectString(DataToSave.Status, StatusJson))
+		{
+			UPlayFabJsonObject* StatusJsonObj = NewObject<UPlayFabJsonObject>();
+			StatusJsonObj->DecodeJson(StatusJson);
+			ItemToUpdate->SetObjectField(TEXT("Status"), StatusJsonObj);
+		}
+	}
+	if (DataToSave.IsDirty(EDF_Skills))
+	{
+		ItemToUpdate->SetStringArrayField(TEXT("Skills"), DataToSave.Skills);
+	}
+
+	ItemToUpdate->SetNumberField(TEXT("LocX"), DataToSave.LocX);
+	ItemToUpdate->SetNumberField(TEXT("LocY"), DataToSave.LocY);
+	ItemToUpdate->SetNumberField(TEXT("LocZ"), DataToSave.LocZ);
 	
-	ItemToUpdate->SetStringField(TEXT("Id"), DataToSave.GetItemInstanceId());
-	Request.ItemInstanceId = DataToSave.GetItemInstanceId();
+
 	Request.Data = ItemToUpdate;
 
-
-	UPlayFabEconomyAPI::FDelegateOnSuccessUpdateInventoryItems SuccessDelegate;
+	UPlayFabServerAPI::FDelegateOnSuccessUpdateUserInventoryItemCustomData SuccessDelegate;
 	SuccessDelegate.BindUFunction(this, FName("OnSucessUpdateCharacter"));
 
-	UPlayFabEconomyAPI::FDelegateOnFailurePlayFabError FailureDelegate;
+	UPlayFabServerAPI::FDelegateOnFailurePlayFabError FailureDelegate;
 	FailureDelegate.BindUFunction(this, FName("OnUpdateFailure"));
 
-	UPlayFabServerAPI* Proxy = UPlayFabEconomyAPI::UpdateInventoryItems(
+	UPlayFabServerAPI::UpdateUserInventoryItemCustomData(
 		Request,
 		SuccessDelegate,
 		FailureDelegate,
@@ -305,14 +355,14 @@ void UNetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSav
 	);
 }
 
-void UNetworkTask::ExecuteGrantNewCharItem(FString InEntityId, FString InName, EClassType InJob)
+void UNetworkTask::ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob)
 {
 
 	FEconomyAddInventoryItemsRequest Request;
 	ExecuteTimer();
 
 	UPlayFabJsonObject* EntityObj = NewObject<UPlayFabJsonObject>();
-	EntityObj->SetStringField(TEXT("Id"), InEntityId);
+	EntityObj->SetStringField(TEXT("Id"), InCustomId);
 	EntityObj->SetStringField(TEXT("Type"), TEXT("title_player_account"));
 
 	Request.Entity = EntityObj;
