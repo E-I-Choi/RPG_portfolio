@@ -21,6 +21,7 @@ void ANetworkTask::InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requ
 
 void ANetworkTask::FinishTask(bool bSuccess)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Net task : (bool) %d"), bSuccess);
 
 	if (UWorld* World = GetWorld())
 	{
@@ -370,8 +371,10 @@ void ANetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSav
 
 void ANetworkTask::ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob)
 {
+	FServerGrantItemsToUserRequest Reqeust;
 
-	FEconomyAddInventoryItemsRequest Request;
+	// FEconomyAddInventoryItemsRequest Request;
+	
 	ExecuteTimer();
 
 	UPlayFabJsonObject* EntityObj = NewObject<UPlayFabJsonObject>();
@@ -399,6 +402,13 @@ void ANetworkTask::ExecuteGrantNewCharItem(FString InCustomId, FString InName, E
 		ItemReference->SetObjectField(TEXT("DisplayProperties"), DisplayPropsObj);
 	}
 	Request.Item = ItemReference;
+
+	UPlayFabServerAPI::GrantItemsToUser(
+		Request,
+		SuccessDelegate,
+		FailureDelegate,
+		nullptr
+	)
 	
 	UPlayFabEconomyAPI::FDelegateOnSuccessAddInventoryItems SuccessDelegate;
 	SuccessDelegate.BindUFunction(this, FName("OnSucessGrantCharacter"));
