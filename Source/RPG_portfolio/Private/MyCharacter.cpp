@@ -1,3 +1,5 @@
+/* 인게임에서 실제 플레이어가 빙의하는 메인 캐릭터 */
+
 #include "MyCharacter.h"
 
 #include "CharConditionComponent.h"
@@ -14,8 +16,6 @@
 #include "Engine/World.h"
 
 
-
-// Sets default values
 AMyCharacter::AMyCharacter()
 {
 	ConditionComponent = CreateDefaultSubobject<UCharConditionComponent>(TEXT("ConditionComponent"));
@@ -71,91 +71,108 @@ void AMyCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME(AMyCharacter, Status);
 }
 
-// Called every frame
+
 void AMyCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-
 void AMyCharacter::OnRep_CharExp()
 {
 	OnRepEvent(EOnRepType::Exp);
 	if (ConditionComponent)
 	{
+
+		/* EXP 변경을 알립니다. */
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Exp);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharWeapon()
 {
 	OnRepEvent(EOnRepType::Weapon);
 	if (ConditionComponent)
 	{
+		/* 무기 변경을 알립니다. */
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Weapon);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharHat()
 {
 	OnRepEvent(EOnRepType::Hat);
 	if (ConditionComponent)
 	{
+		/* 모자 변경을 알립니다. */
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Hat);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharTop()
 {
 	OnRepEvent(EOnRepType::Top);
 	if (ConditionComponent)
 	{
+		/* 상의 변경을 알립니다.*/
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Top);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharPants()
 {
 	OnRepEvent(EOnRepType::Pants);
 	if (ConditionComponent)
 	{
+		/* 하의 변경을 알립니다.*/
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Pants);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharShoes()
 {
 	OnRepEvent(EOnRepType::Shoes);
 	if (ConditionComponent)
 	{
+		/* 신발 변경을 알립니다.*/
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Shoes);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharJob()
 {
 	OnRepEvent(EOnRepType::Job);
 	if (ConditionComponent)
 	{
+		/* 직업 변경을 알립니다.*/
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Job);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharSkills()
 {
 	OnRepEvent(EOnRepType::Skills);
 	if (ConditionComponent)
 	{
+		/* 스킬 목록 변경을 알립니다.*/
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Skills);
 	}
 }
+
 
 void AMyCharacter::OnRep_CharStatus()
 {
 	OnRepEvent(EOnRepType::Status);
 	if (ConditionComponent)
 	{
+		/* 스탯 변경을 알립니다.*/
 		ConditionComponent->OnCharDataChanged.Broadcast(EOnRepType::Status);
 	}
 }

@@ -39,7 +39,7 @@ public:
 	UFUNCTION()
 	void ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave);
 	UFUNCTION()
-	void ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob);
+	void ExecuteGrantNewCharItem(FString InCustomId);
 	ENetConnectionType ConnectionType = ENetConnectionType::none;
 	TWeakObjectPtr<class APlayerController> RequestorPC;
 	

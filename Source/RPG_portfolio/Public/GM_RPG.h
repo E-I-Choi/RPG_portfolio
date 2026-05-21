@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,7 +7,7 @@
 #include "GM_RPG.generated.h"
 
 /**
- * 
+ * @brief 인게임(월드)에서 사용되는 GameMode
  */
 UCLASS()
 class RPG_PORTFOLIO_API AGM_RPG : public ARPG_portfolioGameMode
@@ -25,8 +23,11 @@ protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 	virtual void Logout(AController* Exiting) override;
 
-	//Dirty라고 명명했지만 현재 Dirty 판별은 사용하지 않고 언제나 Save 실행함
+	/**
+	* @brief 모든 플레이어의 Dirty데이터를 DB에게 동기화.
+	*/
 	void SaveAllDirtyPlayerData();
+
 
 	FTimerHandle SaveTimerHandle;
 

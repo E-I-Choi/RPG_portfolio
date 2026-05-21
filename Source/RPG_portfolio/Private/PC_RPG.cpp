@@ -1,7 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #include "PC_RPG.h"
 #include "RPGGameInstance.h"
+
 
 void APC_RPG::Client_ReceiveNetResponse_Implementation(const FNetworkReturnResult& Result)
 {
@@ -175,7 +174,7 @@ void APC_RPG::Client_ReceiveReqSaveCharacter_Implementation()
 {
 	URPGGameInstance* GI = Cast<URPGGameInstance>(GetGameInstance());
 	Server_ReqSaveCharacter(GetCharData(), GI->GetCustomId());
-}
+} 
 
 void APC_RPG::Client_ReceiveReqSaveCharacterWithData_Implementation(const FCharData& InCharData)
 {

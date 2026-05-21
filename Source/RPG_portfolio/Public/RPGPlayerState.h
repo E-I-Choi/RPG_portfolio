@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -13,6 +11,9 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharNameChanged, FName, NewName);
 
 
+/**
+* @brief 현재 사용하지 않음.
+*/
 UCLASS()
 class RPG_PORTFOLIO_API ARPGPlayerState : public APlayerState
 {

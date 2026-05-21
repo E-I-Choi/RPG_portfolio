@@ -1,5 +1,7 @@
 #include "BPFL_Character.h"
 
+
+
 FStatus UBPFL_Character::GetBaseStatusByClass(EClassType InClassType)
 {
 	FStatus Stats;
@@ -39,6 +41,7 @@ FStatus UBPFL_Character::GetBaseStatusByClass(EClassType InClassType)
 	}
 	return Stats;
 }
+
 
 FEquips UBPFL_Character::GetBaseEquipsByClass(EClassType InClassType)
 {

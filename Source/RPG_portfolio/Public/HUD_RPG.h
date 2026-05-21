@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -8,7 +6,7 @@
 #include "HUD_RPG.generated.h"
 
 /**
- * 
+ * @brief  인게임에서 사용되는 HUD
  */
 UCLASS()
 class RPG_PORTFOLIO_API AHUD_RPG : public AHUD
@@ -16,10 +14,5 @@ class RPG_PORTFOLIO_API AHUD_RPG : public AHUD
 	GENERATED_BODY()
 
 public:
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RPG/HUD")
-	TMap<EHudIntersectionType, bool> Intersection = {
-		{EHudIntersectionType::ShineCreate, true}
-	};
 	
 };

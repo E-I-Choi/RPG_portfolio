@@ -124,6 +124,7 @@ void ANetworkTask::OnSucessLoadCharacters(FServerGetUserInventoryResult Result, 
 void ANetworkTask::OnSucessGrantCharacter(FServerGrantItemsToUserResult Result, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight)) return;
+	UE_LOG(LogTemp, Warning, TEXT("Successed to grant."));
 	FNetworkReturnResult MyReturn;
 	MyReturn.Response = ENetResponseType::Success;
 	MyReturn.Type = ENetConnectionType::NewCharacter;
@@ -146,7 +147,7 @@ void ANetworkTask::OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject*
 		UE_LOG(LogTemp, Warning, TEXT("Zombie Task Defeated: Ignoring late response."));
 		return;
 	}
-
+	
 	FNetworkReturnResult MyReturn;
 	MyReturn.Response = ENetResponseType::Success;
 	MyReturn.Type = ENetConnectionType::SaveCharacters;
@@ -160,6 +161,8 @@ void ANetworkTask::OnSucessUpdateCharacter(FServerEmptyResponse Result, UObject*
 			RPGPC->Client_ReceiveNetResponse(MyReturn);
 		}
 	}
+
+
 
 	this->FinishTask(true);
 }
@@ -192,6 +195,7 @@ void ANetworkTask::OnLoadFailure(FPlayFabError Error, UObject* CustomData)
 void ANetworkTask::OnGrantFailure(FPlayFabError Error, UObject* CustomData)
 {
 	if (!(CurrentState == ETaskState::InFlight)) return;
+	UE_LOG(LogTemp, Warning, TEXT("Failed to grant."));
 	FNetworkReturnResult MyReturn;
 	MyReturn.Response = ENetResponseType::Failed;
 	MyReturn.Type = ENetConnectionType::NewCharacter;
@@ -270,13 +274,6 @@ void ANetworkTask::ExecuteLoadCharacters(FString InCustomId)
 
 	FString CurrentTitleId = GetDefault<UPlayFabRuntimeSettings>()->TitleId;
 
-	auto Settings = GetDefault<UPlayFabRuntimeSettings>();
-
-	if (FHttpModule::Get().IsHttpEnabled())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Http is disabled"));
-	}
-
 	UPlayFabServerAPI* Task = UPlayFabServerAPI::GetUserInventory(
 		Request, SuccessDelegate, FailureDelegate, nullptr);
 	Task->Activate();
@@ -285,7 +282,6 @@ void ANetworkTask::ExecuteLoadCharacters(FString InCustomId)
 
 void ANetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSave)
 {
-	
 	FServerUpdateUserInventoryItemDataRequest Request;
 	ExecuteTimer();
 
@@ -369,54 +365,24 @@ void ANetworkTask::ExecuteUpdateCharData(FString InCustomId, FCharData DataToSav
 	);
 }
 
-void ANetworkTask::ExecuteGrantNewCharItem(FString InCustomId, FString InName, EClassType InJob)
+void ANetworkTask::ExecuteGrantNewCharItem(FString InCustomId)
 {
-	FServerGrantItemsToUserRequest Reqeust;
 
-	// FEconomyAddInventoryItemsRequest Request;
+	FServerGrantItemsToUserRequest Request;
 	
 	ExecuteTimer();
 
-	UPlayFabJsonObject* EntityObj = NewObject<UPlayFabJsonObject>();
-	EntityObj->SetStringField(TEXT("Id"), InCustomId);
-	EntityObj->SetStringField(TEXT("Type"), TEXT("title_player_account"));
-
-	Request.Entity = EntityObj;
-
-	UPlayFabJsonObject* ItemReference = NewObject<UPlayFabJsonObject>();
+	Request.PlayFabId = InCustomId;
 	
-	ItemReference->SetStringField(TEXT("Id"), TEXT("3495eae5-9b95-42c2-9b38-2d3d615286d1"));
-	ItemReference->SetNumberField(TEXT("Amount"), 1);
+	Request.ItemIds = TEXT("CharacterData");
 
-	FCharData InitialData;
-	InitialData.Status = UBPFL_Character::GetBaseStatusByClass(InJob);
-	InitialData.Equips = UBPFL_Character::GetBaseEquipsByClass(InJob);
-	InitialData.Name = InName;
-	InitialData.Job = InJob;
-
-	TSharedPtr<FJsonObject> RootObj = FJsonObjectConverter::UStructToJsonObject(InitialData);
-	if (RootObj.IsValid())
-	{
-		UPlayFabJsonObject* DisplayPropsObj = NewObject<UPlayFabJsonObject>();
-		DisplayPropsObj->SetRootObject(RootObj);
-		ItemReference->SetObjectField(TEXT("DisplayProperties"), DisplayPropsObj);
-	}
-	Request.Item = ItemReference;
-
-	UPlayFabServerAPI::GrantItemsToUser(
-		Request,
-		SuccessDelegate,
-		FailureDelegate,
-		nullptr
-	)
-	
-	UPlayFabEconomyAPI::FDelegateOnSuccessAddInventoryItems SuccessDelegate;
+	UPlayFabServerAPI::FDelegateOnSuccessGrantItemsToUser SuccessDelegate;
 	SuccessDelegate.BindUFunction(this, FName("OnSucessGrantCharacter"));
 
-	UPlayFabEconomyAPI::FDelegateOnFailurePlayFabError FailureDelegate;
+	UPlayFabServerAPI::FDelegateOnFailurePlayFabError FailureDelegate;
 	FailureDelegate.BindUFunction(this, FName("OnGrantFailure"));
 
-	UPlayFabEconomyAPI* Proxy = UPlayFabEconomyAPI::AddInventoryItems(
+	UPlayFabServerAPI::GrantItemsToUser(
 		Request,
 		SuccessDelegate,
 		FailureDelegate,

@@ -1,8 +1,15 @@
+/** 
+* @brief 게임 구현에 필요한 Enum, 구조체, 클래스들을 정의하는 문서
+*/
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameTypes.generated.h"
 
+/** 
+* @brief 캐릭터 직업 종류
+*/
 UENUM(BlueprintType)
 enum class EClassType : uint8
 {
@@ -13,6 +20,9 @@ enum class EClassType : uint8
 	warrior UMETA(DisplayName = "Warrior")
 };
 
+/** 
+* @brief OnRep이벤트 유형
+*/
 UENUM()
 enum class EOnRepType : uint8
 {
@@ -31,6 +41,9 @@ enum class EOnRepType : uint8
 	Status
 };
 
+/** 
+* @brief 무기 종류 
+*/
 UENUM(BlueprintType)
 enum class EWeaponType :uint8
 {
@@ -42,6 +55,9 @@ enum class EWeaponType :uint8
 	bow UMETA(DisplayName = "Bow")
 };
 
+/** 
+* @brief 모자 종류
+*/
 UENUM(BlueprintType)
 enum class EHatType :uint8
 {
@@ -52,6 +68,9 @@ enum class EHatType :uint8
 	feather_hat UMETA(DisplayName = "Feather Hat")
 };
 
+/**
+* @brief 상의 종류
+*/
 UENUM(BlueprintType)
 enum class ETopType :uint8
 {
@@ -61,6 +80,9 @@ enum class ETopType :uint8
 	robe UMETA(DisplayName = "Robe")
 };
 
+/** 
+* @brief 하의 종류
+*/
 UENUM(BlueprintType)
 enum class EBottomsType :uint8
 {
@@ -69,6 +91,9 @@ enum class EBottomsType :uint8
 	armor_bottoms UMETA(DisplayName = "Armor Bottoms")
 };
 
+/**
+* @brief 신발 종류
+*/
 UENUM(BlueprintType)
 enum class EFootsType :uint8
 {
@@ -77,6 +102,9 @@ enum class EFootsType :uint8
 	combat_shoes UMETA(DisplayName = "Combat Shoes")
 };
 
+/**
+* @brief 무기와 모자, 상하의, 신발 전체를 아우르는 장비 구성 클래스
+*/
 USTRUCT(BlueprintType)
 struct FEquips
 {
@@ -103,6 +131,9 @@ public:
 	{}
 };
 
+/**
+* @brief 캐릭터 스탯 구조체
+*/
 USTRUCT(BlueprintType)
 struct FStatus
 {
@@ -128,8 +159,9 @@ public:
 };
 
 
-/*현재는 FCharData& Data 전체의 Dirty 여부만 판별하여 Data를 전부 업데이트 Or No 구조이지만
-확장성을 고려하여 DirtyFlag는 각 멤버별로 Dirty를 판별할 수 있도록 지정해 둠*/
+/**
+* @brief 네트워크 사용량 최소화를 위한 DirtyBits.
+*/
 enum ECharacterDirtyFlags
 {
 	EDF_None = 0,
@@ -144,6 +176,9 @@ enum ECharacterDirtyFlags
 	EDF_MP = 1<<8
 };
 
+/**
+* @brief 전체 캐릭터 데이터 구조체 
+*/
 USTRUCT(BlueprintType)
 struct FCharData
 {
@@ -176,6 +211,7 @@ public:
 	int32 LocZ = 0;
 	
 	uint8 DirtyBits = 0;
+
 	bool IsDirty(ECharacterDirtyFlags Flag) const { return  (DirtyBits & Flag) != 0 ; }
 	void SetDirty(ECharacterDirtyFlags Flag) { DirtyBits |= Flag; }
 	void ClearDirty() { DirtyBits = 0; } 
@@ -197,12 +233,18 @@ public:
 	{ }
 };
 
+/**
+* @brief UI에서 최초 표시 판별이 필요한 요소 유형
+*/
 UENUM(BlueprintType)
 enum class EHudIntersectionType : uint8
 {
 	ShineCreate UMETA(DisplayName = "NewChar")
 };
 
+/**
+* @brief 네트워크 통신 유형
+*/
 UENUM(BlueprintType)
 enum class ENetConnectionType : uint8
 {
@@ -213,6 +255,9 @@ enum class ENetConnectionType : uint8
 	NewCharacter UMETA(DisplayName = "NewCharacter")
 };
 
+/**
+* @brief 네트워크 응답 유형
+*/
 UENUM(BlueprintType)
 enum class ENetResponseType : uint8
 {
@@ -221,6 +266,9 @@ enum class ENetResponseType : uint8
 	Timeout UMETA(DisplayName = "Timeout")
 };
 
+/**
+* @brief 네트워크 통신 이후, 결과 데이터를 전달하기 위한 구조체
+*/
 USTRUCT(BlueprintType)
 struct FNetworkReturnResult
 {

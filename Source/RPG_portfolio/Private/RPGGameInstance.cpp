@@ -25,7 +25,6 @@ URPGGameInstance::URPGGameInstance()
 void URPGGameInstance::Init()
 {
     Super::Init();
-
     InitServerPlayFab();
 
 }
@@ -65,7 +64,7 @@ void URPGGameInstance::CreateNewCharacter(APlayerController* RequestorPC, const 
     LoadTask->InitUNetworkTask(RequestorPC, ENetConnectionType::NewCharacter, TEXT("NewCharacter"), 10.0f, RequestSequenceIndex);
     RequestSequenceIndex++;
     
-    LoadTask->ExecuteGrantNewCharItem(InEntityId, InName, InJob);
+    LoadTask->ExecuteGrantNewCharItem(InEntityId);
 
 	return;
 }
@@ -119,7 +118,7 @@ void URPGGameInstance::SetPlayFabInfo(const FString& InId)
 
 ANetworkTask* URPGGameInstance::AddNetworkTask()
 {
-    ANetworkTask* NewTask = NewObject<ANetworkTask>(this);
+    ANetworkTask* NewTask = GetWorld()->SpawnActor<ANetworkTask>(ANetworkTask::StaticClass());
     ActiveTasks.Add(NewTask);
     NewTask->OnPostTaskDestroy.BindUObject(this, &URPGGameInstance::RemoveNetworkTask);
 

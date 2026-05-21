@@ -1,3 +1,5 @@
+
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -6,24 +8,30 @@
 #include "CharConditionComponent.h"
 #include "MyCharacter.generated.h"
 
-class UMyConditionComponent;
 
+/** 
+* @brief 인게임에서 실제 플레이어가 빙의하는 메인 캐릭터
+*/
 UCLASS()
 class RPG_PORTFOLIO_API AMyCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AMyCharacter();
 
+	/** 
+	* @brief 3D위젯에 표출되는 데이터를 관리하는 컴포넌트
+	* 또한 로컬 위젯에게 데이터 변경을 알리는 역할
+	*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UCharConditionComponent* ConditionComponent;
 
+	/** 
+	* @brief 변수들에게 Rep 설정. 따로 호출 필요하지 않음.*/
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 
-	
 	UPROPERTY(ReplicatedUsing = OnRep_CharExp, BlueprintReadOnly, Category = "RPG/Character")
 	float Exp = 1.f;
 	UPROPERTY(ReplicatedUsing = OnRep_CharWeapon, BlueprintReadOnly, Category = "RPG/Character")
@@ -82,6 +90,11 @@ protected:
 	void OnRep_CharSkills();
 	UFUNCTION()
 	void OnRep_CharStatus();
+
+	/**
+	* @brief Condition을 제외한 모든 캐릭터 데이터 변경을 알립니다.
+	* 이 이벤트는 장비·외형 등 비주얼 컴포넌트들의 업데이트 신호로 사용됩니다.
+	*/
 	UFUNCTION(BlueprintImplementableEvent, Category = "Event")
 	void OnRepEvent(EOnRepType RepType);
 };

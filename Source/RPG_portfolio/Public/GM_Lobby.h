@@ -15,7 +15,7 @@
 #include "GM_Lobby.generated.h"
 
 /**
- * 
+ * @brief 로비에서 사용되는 GameMode
  */
 UCLASS()
 class RPG_PORTFOLIO_API AGM_Lobby : public AGameModeBase
