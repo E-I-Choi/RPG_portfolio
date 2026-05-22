@@ -46,7 +46,7 @@ public:
 	* @param InTicketId 타임아웃 발생 시 출력할 로그를 위한 통신 오더 식별자
 	*/
 	UFUNCTION()
-	void InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requestor, ENetConnectionType Type, FString InContext = "", float InTimeLimit, int32 InTicketId);
+	void InitUNetworkTask(TWeakObjectPtr<class APlayerController> Requestor, ENetConnectionType Type, FString InContext, float InTimeLimit, int32 InTicketId);
 	
 	/**
 	* @brief TimeOut을 판별하기 위해 통신 직전에 호출하는 함수 (非필수 요소)
