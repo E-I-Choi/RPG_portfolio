@@ -1,3 +1,7 @@
+![Unreal Engine](https://img.shields.io/badge/Unreal%20Engine-5.3-black?logo=unrealengine)
+![C++](https://img.shields.io/badge/C++-00599C?logo=cplusplus&logoColor=white)
+![PlayFab](https://img.shields.io/badge/PlayFab-blue)
+
 소개 영상 url
 https://www.youtube.com/watch?v=VFLvDHEaI58
 
